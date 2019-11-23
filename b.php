@@ -4,7 +4,7 @@
     <a href="index.php">
         <h1>Base de Dados 2019/2020 Parte III</h1>
     </a>
-    <h3>Inserir e remover Locais, Items ou Anomalias</h3>
+    <h3>Inserir, editar e remover correcoes e propostas de correcao</h3>
 </header>
 
 <body>
@@ -23,31 +23,54 @@
         $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
         header("Location:/a.php");
     }
-    function deleteEntry_Correcao($db, $latitude, $longitude)
+    function editEntry_Correcao($db, $email, $nro, $anomalia_id, $email_old, $nro_old, $anomalia_id_old)
     {
-        $sql = "DELETE from local_publico WHERE latitude = :latitude and longitude = :longitude;";
+        $sql = "UPDATE account SET email = :email and nro=:nro and anomalia_id=:anomalia_id 
+        WHERE email = :email_old and nro=:nro_old and anomalia_id=:anomalia_id_old;";
+
         $result = $db->prepare($sql);
-        $result->execute([':latitude' => $latitude, ':longitude' => $longitude]);
+        $result->execute([
+            ':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id,
+            ':email_old' => $email_old, ':nro_old' => $nro_old, ':anomalia_id_old' => $anomalia_id_old
+        ]);
+    }
+    function deleteEntry_Correcao($db, $email, $nro, $anomalia_id)
+    {
+        $sql = "DELETE from correcao WHERE email = :email and nro = :nro and anomalia_id = :anomalia_id;";
+        $result = $db->prepare($sql);
+        $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
         header("Location:/a.php");
     }
 
-    function addEntry_PropostaCorrecao($db, $descricao, $localizacao, $latitude, $longitude)
+
+    function addEntry_PropostaCorrecao($db, $email, $nro, $data_hora, $texto)
     {
-        $sql = "INSERT INTO item (id,descricao,localizacao,longitude,latitude) 
-        VALUES (default,:descricao,:localizacao,:longitude,:latitude)";
+        $sql = "INSERT INTO proposta_de_correcao (email,nro,data_hora,texto) 
+        VALUES (:email,:nro,:data_hora,:texto)";
         $result = $db->prepare($sql);
-        $result->execute([':descricao' => $descricao,  ':localizacao' => $localizacao, ':longitude' => $longitude, ':latitude' => $latitude]);
+        $result->execute([':email' => $email,  ':nro' => $nro, ':data_hora' => $data_hora, ':texto' => $texto]);
         header("Location:/a.php");
     }
-    function deleteEntry_PropostaCorrecao($db, $id)
+    function editEntry_PropostaCorrecao($db, $email, $nro, $data_hora, $texto, $email_old, $nro_old)
     {
-        $sql = "DELETE from item WHERE id = :id;";
+        $sql = "UPDATE account SET email = :email and nro=:nro and data_hora=:data_hora and texto=:texto 
+        WHERE email = :email_old and nro=:nro_old;";
+
         $result = $db->prepare($sql);
-        $result->execute([':id' => $id]);
+        $result->execute([
+            ':email' => $email, ':nro' => $nro, ':data_hora' => $data_hora, ':texto' => $texto,
+            ':email_old' => $email_old, ':nro_old' => $nro_old
+        ]);
+    }
+    function deleteEntry_PropostaCorrecao($db, $email, $nro)
+    {
+        $sql = "DELETE from proposta_de_correcao WHERE email = :email and nro = :nro;";
+        $result = $db->prepare($sql);
+        $result->execute([':email' => $email, ':nro' => $nro]);
         header("Location:/a.php");
     }
 
-    function ShowForm($db, $tableName)
+    function ShowForm($tableName, $add) #add is a flag, 1 if adding, 0 if editing
     {
         echo ("<div style=\"
         width:400px;
@@ -64,14 +87,34 @@
 
         echo "<form name=\"form\" method=\"get\">";
         if ($tableName == 'correcao') {
-            echo "<h3>Adicionar uma Correcao</h3>";
-            echo "<input type=\"hidden\" name=\"action\" value=\"addCorrecao\"/></p>";
+            if (!$add) {
+                $email_old = $_GET['email_old'];
+                $nro_old = $_GET['nro_old'];
+                $anomalia_id_old = $_GET['anomalia_id_old'];
+                echo "<h3>Editar uma Correcao</h3>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"editCorrecao\"/></p>";
+                echo "<input type=\"hidden\" name=\"email_old\" value=\"$email_old\"/></p>";
+                echo "<input type=\"hidden\" name=\"nro_old\" value=\"$nro_old\"/></p>";
+                echo "<input type=\"hidden\" name=\"anomalia_id_old\" value=\"$anomalia_id_old\"/></p>";
+            } else {
+                echo "<h3>Adicionar uma Correcao</h3>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"addCorrecao\"/></p>";
+            }
             echo "<p>Email: <input type=\"text\" name=\"email\"/></p>";
             echo "<p>Nro: <input type=\"text\" name=\"nro\"/></p>";
             echo "<p>ID da Anomalia: <input type=\"text\" name=\"anomalia_id\"/></p>";
         } else {
-            echo "<h3>Adicionar uma Proposta de Correcao</h3>";
-            echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
+            if (!$add) {
+                $email_old = $_GET['email_old'];
+                $nro_old = $_GET['nro_old'];
+                echo "<h3>Editar uma Proposta de Correcao</h3>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"editPropostaCorrecao\"/></p>";
+                echo "<input type=\"hidden\" name=\"email_old\" value=\"$email_old\"/></p>";
+                echo "<input type=\"hidden\" name=\"nro_old\" value=\"$nro_old\"/></p>";
+            } else {
+                echo "<h3>Adicionar uma Proposta de Correcao</h3>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
+            }
             echo "<p>Email: <input type=\"text\" name=\"email\"/></p>";
             echo "<p>Nro: <input type=\"text\" name=\"nro\"/></p>";
             echo "<p>Data/Hora: <input type=\"text\" name=\"data_hora\"/></p>";
@@ -93,27 +136,43 @@
 
         switch ($_GET['action']) {
             case "addCorrecao":
-                addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
+                addEntry_Correcao($db, $_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
                 break;
             case "editCorrecao":
-                addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
+                editEntry_Correcao(
+                    $db,
+                    $_GET['email'],
+                    $_GET['nro'],
+                    $_GET['anomalia_id'],
+                    $_GET['email_old'],
+                    $_GET['nro_old'],
+                    $_GET['anomalia_id_old']
+                );
                 break;
             case "deleteCorrecao":
-                deleteEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude']);
+                deleteEntry_Correcao($db, $$_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
                 break;
 
             case "addPropostaCorrecao":
-                addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
+                addEntry_PropostaCorrecao($db, $_GET['email'], $_GET['nro'], $_GET['data_hora'], $_GET['texto']);
                 break;
             case "editPropostaCorrecao":
-                addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
+                editEntry_PropostaCorrecao(
+                    $db,
+                    $_GET['email'],
+                    $_GET['nro'],
+                    $_GET['data_hora'],
+                    $_GET['texto'],
+                    $_GET['email_old'],
+                    $_GET['nro_old']
+                );
                 break;
             case "deletePropostaCorrecao":
-                deleteEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude']);
+                deleteEntry_PropostaCorrecao($db, $_GET['email'], $_GET['nro']);
                 break;
 
             case "showForm":
-                ShowForm($db, $_GET['tableName']);
+                ShowForm($_GET['tableName'], $_GET['add']);
                 break;
         }
 
@@ -138,12 +197,16 @@
             $nro = $row['nro'];
             $anomalia_id = $row['anomalia_id'];
             echo ("<tr>");
-            echo ("<td>{$row['email']}</td>\n");
-            echo ("<td>{$row['nro']}</td>\n");
-            echo ("<td>{$row['anomalia_id']}</td>\n");
+            echo ("<td>{$email}</td>\n");
+            echo ("<td>{$nro}</td>\n");
+            echo ("<td>{$anomalia_id}</td>\n");
             echo ("<td><a href=\"a.php?action=deleteCorrecao&
             email=$email&nro=$nro&anomalia_id=$anomalia_id\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/>
+            </a></td>");
+            echo ("<td><a href=\"a.php?action=editCorrecao&
+            email=$email&nro=$nro&anomalia_id=$anomalia_id&email_old=$email&nro_old=$nro&anomalia_id_old=$anomalia_id\">
+            <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='edit.jpeg'/>
             </a></td>");
             echo ("</tr>\n");
         }
@@ -168,13 +231,19 @@
         foreach ($result as $row) {
             $email = $row['email'];
             $nro = $row['nro'];
+            $data_hora = $row['data_hora'];
+            $texto = $row['texto'];
             echo ("<tr>");
-            echo ("<td>{$row['email']}</td>\n");
-            echo ("<td>{$row['nro']}</td>\n");
-            echo ("<td>{$row['data_hora']}</td>\n");
-            echo ("<td>{$row['texto']}</td>\n");
+            echo ("<td>{$email}</td>\n");
+            echo ("<td>{$nro}</td>\n");
+            echo ("<td>{$data_hora}</td>\n");
+            echo ("<td>{$texto}</td>\n");
             echo ("<td><a href=\"a.php?action=deletePropostaCorrecao&email=$email&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
+            echo ("<td><a href=\"a.php?action=editPropostaCorrecao&
+            email=$email&nro=$nro&data_hora=$data_hora&texto=$texto&email_old=$email&nro_old=$nro\">
+            <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='edit.jpeg'/>
+            </a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
