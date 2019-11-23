@@ -9,44 +9,64 @@
 
 <body>
     <?php
-    function deleteEntry($db, $tableName, $whereArgs)
+    function console_log($data)
     {
-        $db->exec("DELETE from $tableName where $whereArgs");
+        echo '<script>';
+        echo 'console.log(' . json_encode($data) . ')';
+        echo '</script>';
+    }
+
+    function addEntry_LocalPublico($db, $latitude, $longitude, $nome)
+    {
+        $sql = "INSERT INTO local_publico (nome,longitude,latitude) VALUES (:nome,:longitude,:latitude)";
+        $result = $db->prepare($sql);
+        $result->execute([':nome' => $nome, ':longitude' => $longitude, ':latitude' => $latitude]);
         header("Location:/a.php");
     }
-    function addEntry($db, $tableName)
+    function deleteEntry_LocalPublico($db, $latitude, $longitude)
     {
-        if ($tableName == 'local_publico') {
-            $nome = $_GET['nome'];
-            $longitude = $_GET['longitude'];
-            $latitude = $_GET['latitude'];
-            $db->exec("INSERT INTO $tableName (nome,longitude,latitude) 
-            VALUES ('$nome',$longitude,$latitude)");
-            header("Location:/a.php");
-        } else if ($tableName == 'item') {
-            $descricao = $_GET['descricao'];
-            $localizacao = $_GET['localizacao'];
-            $longitude = $_GET['longitude'];
-            $latitude = $_GET['latitude'];
-            $db->exec("INSERT INTO $tableName (id,descricao,localizacao,longitude,latitude) 
-            VALUES (default,'$descricao','$localizacao',$longitude,$latitude)");
-            header("Location:/a.php");
-        } else {
-            $zona = $_GET['zona'];
-            $imagem = $_GET['imagem'];
-            $lingua = $_GET['lingua'];
-            $ts = $_GET['ts'];
-            $descricao = $_GET['descricao'];
-            $tem_anomalia_redacao = $_GET['tem_anomalia_redacao'];
-            if ($tem_anomalia_redacao == 'on') {
-                $tem_anomalia_redacao = true;
-            } else {
-                $tem_anomalia_redacao = false;
-            }
-            $db->exec("INSERT INTO $tableName (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
-            VALUES (default,$zona,'$imagem','$lingua','$ts','$descricao',$tem_anomalia_redacao)");
-            header("Location:/a.php");
-        }
+        $sql = "DELETE from local_publico WHERE latitude = :latitude and longitude = :longitude;";
+        $result = $db->prepare($sql);
+        $result->execute([':latitude' => $latitude, ':longitude' => $longitude]);
+        header("Location:/a.php");
+    }
+
+    function addEntry_Item($db, $descricao, $localizacao, $latitude, $longitude)
+    {
+        $sql = "INSERT INTO item (id,descricao,localizacao,longitude,latitude) 
+        VALUES (default,:descricao,:localizacao,:longitude,:latitude)";
+        $result = $db->prepare($sql);
+        $result->execute([':descricao' => $descricao,  ':localizacao' => $localizacao, ':longitude' => $longitude, ':latitude' => $latitude]);
+        header("Location:/a.php");
+    }
+    function deleteEntry_Item($db, $id)
+    {
+        $sql = "DELETE from item WHERE id = :id;";
+        $result = $db->prepare($sql);
+        $result->execute([':id' => $id]);
+        header("Location:/a.php");
+    }
+
+    function addEntry_Anomalia($db, $zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao)
+    {
+        $tem_anomalia_redacao == 'on' ? $tem_anomalia_redacao = 1 : $tem_anomalia_redacao = 0;
+        str_replace('"', "", $zona);
+
+        $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
+        VALUES (default,:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
+        $result = $db->prepare($sql);
+        $result->execute([
+            ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
+            ':ts' => $ts, ':descricao' => $descricao, ':tem_anomalia_redacao' => $tem_anomalia_redacao
+        ]);
+        header("Location:/a.php");
+    }
+    function deleteEntry_Anomalia($db, $id)
+    {
+        $sql = "DELETE from anomalia WHERE id = :id;";
+        $result = $db->prepare($sql);
+        $result->execute([':id' => $id]);
+        header("Location:/a.php");
     }
 
     function ShowForm($db, $tableName)
@@ -65,17 +85,15 @@
         text-align:center;\">");
 
         echo "<form name=\"form\" method=\"get\">";
-        echo "<input type=\"hidden\" name=\"add\" value=\"true\"/></p>";
         if ($tableName == 'local_publico') {
             echo "<h3>Adicionar um local publico</h3>";
-            echo "<input type=\"hidden\" name=\"tableName\" value=\"local_publico\"/></p>";
-
+            echo "<input type=\"hidden\" name=\"action\" value=\"addLocalPublico\"/></p>";
             echo "<p>Nome: <input type=\"text\" name=\"nome\"/></p>";
             echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
             echo "<p>Latitude: <input type=\"text\" name=\"latitude\"/></p>";
         } else if ($tableName == 'item') {
             echo "<h3>Adicionar um item</h3>";
-            echo "<input type=\"hidden\" name=\"tableName\" value=\"item\"/></p>";
+            echo "<input type=\"hidden\" name=\"action\" value=\"addItem\"/></p>";
 
             echo "<p>Descrição: <input type=\"text\" name=\"descricao\"/></p>";
             echo "<p>Localização: <input type=\"text\" name=\"localizacao\"/></p>";
@@ -83,12 +101,12 @@
             echo "<p>Latitude: <input type=\"text\" name=\"latitude\"/></p>";
         } else {
             echo "<h3>Adicionar uma anomalia</h3>";
-            echo "<input type=\"hidden\" name=\"tableName\" value=\"anomalia\"/></p>";
+            echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
 
             echo "<p>Zona: <input type=\"text\" name=\"zona\"/></p>";
             echo "<p>Imagem: <input type=\"text\" name=\"imagem\"/></p>";
             echo "<p>Lingua: <input type=\"text\" name=\"lingua\"/></p>";
-            echo "<p>Time stamp: <input type=\"text\" name=\"ts\"/></p>";
+            echo "<p>Time stamp: <input type=\"datetime\" name=\"ts\"/></p>";
             echo "<p>Descrição: <input type=\"text\" name=\"descricao\"/></p>";
             echo "<p>Anomalia de Redação: <input type=\"checkbox\" name=\"tem_anomalia_redacao\"/></p>";
         }
@@ -103,19 +121,48 @@
         $password = "bd123";
         $dbname = $user;
 
-
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        if (isset($_GET['delete'])) {
-            deleteEntry($db, $_GET['tableName'], $_GET['whereArgs']);
-        }
-        if (isset($_GET['show'])) {
-            ShowForm($db, $_GET['tableName']);
-        }
-        if (isset($_GET['add'])) {
-            $tableName = $_GET['tableName'];
-            addEntry($db, $tableName);
+        switch ($_GET['action']) {
+            case "addLocalPublico":
+                addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
+                break;
+            case "deleteLocalPublico":
+                deleteEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude']);
+                break;
+
+            case "addItem":
+                addEntry_Item(
+                    $db,
+                    $_GET['descricao'],
+                    $_GET['localizacao'],
+                    $_GET['latitude'],
+                    $_GET['longitude']
+                );
+                break;
+            case "deleteItem":
+                deleteEntry_Item($db, $_GET['id']);
+                break;
+
+            case "addAnomalia":
+                addEntry_Anomalia(
+                    $db,
+                    $_GET['zona'],
+                    $_GET['imagem'],
+                    $_GET['lingua'],
+                    $_GET['ts'],
+                    $_GET['descricao'],
+                    $_GET['tem_anomalia_redacao']
+                );
+                break;
+            case "deleteAnomalia":
+                deleteEntry_Anomalia($db, $_GET['id']);
+                break;
+
+            case "showForm":
+                ShowForm($db, $_GET['tableName']);
+                break;
         }
 
 
@@ -142,13 +189,13 @@
             echo ("<td>{$row['nome']}</td>\n");
             echo ("<td>{$row['longitude']}</td>\n");
             echo ("<td>{$row['latitude']}</td>\n");
-            echo ("<td><a href=\"a.php?delete=true&tableName=local_publico&whereArgs=latitude=$latitude and longitude=$longitude;\">
+            echo ("<td><a href=\"a.php?action=deleteLocalPublico&latitude=$latitude&longitude=$longitude\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/>
             </a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"a.php?show=true&tableName=local_publico\">
+        echo ("<a href=\"a.php?action=showForm&tableName=local_publico\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
@@ -174,16 +221,16 @@
             echo ("<td>{$row['localizacao']}</td>\n");
             echo ("<td>{$row['longitude']}</td>\n");
             echo ("<td>{$row['latitude']}</td>\n");
-            echo ("<td><a href=\"a.php?delete=true&tableName=item&
-            whereArgs=id=$id;\">
+            echo ("<td><a href=\"a.php?action=deleteItem&id=$id\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"a.php?show=true&tableName=item\">
+        echo ("<a href=\"a.php?action=showForm&tableName=item\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
+
         $result = $db->prepare($anomalia);
         $result->execute();
 
@@ -209,14 +256,13 @@
             echo ("<td>{$row['ts']}</td>\n");
             echo ("<td>{$row['descricao']}</td>\n");
             echo ("<td>{$row['tem_anomalia_redacao']}</td>\n");
-            echo ("<td><a href=\"a.php?delete=true&tableName=anomalia&
-            whereArgs=id=$id;\">
+            echo ("<td><a href=\"a.php?action=deleteAnomalia&id=$id\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
         echo ("</div>");
-        echo ("<a href=\"a.php?show=true&tableName=anomalia\">
+        echo ("<a href=\"a.php?action=showForm&tableName=anomalia\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
