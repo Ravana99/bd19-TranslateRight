@@ -1,38 +1,41 @@
 /*Locais Publicos*/
 
 insert into local_publico values (38.234783,-7.543872,'LIDL');
-insert into local_publico values (40.283765,-9.248372,'Pingo Doce');
+insert into local_publico values (38.283765,-9.248372,'Pingo Doce');
 insert into local_publico values (39.991734,-8.283723,'Continente');
-insert into local_publico values (41.438713,-8.123456,'Auchan');
-insert into local_publico values (41.127382,-9.283782,'Minipreco');
+insert into local_publico values (38.438713,-8.123456,'Auchan');
+insert into local_publico values (38.127382,-9.283782,'Minipreco');
 insert into local_publico values (38.234782,-7.174222,'Jumbo');
 insert into local_publico values (41.298323,-8.237823,'Aldi');
-insert into local_publico values (40.019287,-7.328113,'Mercadona');
+insert into local_publico values (38.019287,-7.328113,'Mercadona');
 insert into local_publico values (39.346731,-8.219823,'Intermarche');
-insert into local_publico values (40.473823,-9.299992,'Amanhecer');
+insert into local_publico values (38.473823,-9.299992,'Amanhecer');
 
-/*Items*/
+/*Itens*/
 
 insert into item values (1,'Descricao duplicado 1','Lisboa',39.991734,-8.283723);
-insert into item values (2,'Descricao duplicado 2','Beja',40.283765,-9.248372);
-insert into item values (3,'Descricao do item 3','Braga',40.473823,-9.299992);
+insert into item values (2,'Descricao duplicado 2','Beja',38.283765,-9.248372);
+insert into item values (3,'Descricao do item 3','Braga',38.473823,-9.299992);
 insert into item values (4,'Descricao do item 4','Santarem',41.298323,-8.237823);
-insert into item values (5,'Descricao do item 5','Beja',40.283765,-9.248372);
-insert into item values (6,'Descricao do item 6','Vila Real',41.127382,-9.283782);
+insert into item values (5,'Descricao do item 5','Beja',38.283765,-9.248372);
+insert into item values (6,'Descricao do item 6','Vila Real',38.127382,-9.283782);
 insert into item values (7,'Descricao duplicado 1','Lisboa',39.991734,-8.283723);
 insert into item values (8,'Descricao duplicado 1','Lisboa',39.991734,-8.283723);
 insert into item values (9,'Descricao duplicado 9','Porto',39.346731,-8.219823);
 insert into item values (10,'Descricao do item 10','Faro',38.234782,-7.174222);
 insert into item values (11,'Descricao do item 11','Lisboa',39.991734,-8.283723);
 insert into item values (12,'Descricao do item 12','Aveiro',38.234783,-7.543872);
-insert into item values (13,'Descricao do item 13','Vila Real',41.127382,-9.283782);
+insert into item values (13,'Descricao do item 13','Vila Real',38.127382,-9.283782);
 insert into item values (14,'Descricao do item 14','Faro',38.234782,-7.174222);
 insert into item values (15,'Descricao duplicado 9','Porto',39.346731,-8.219823);
-insert into item values (16,'Descricao do item 16','Braga',40.473823,-9.299992);
+insert into item values (16,'Descricao do item 16','Braga',38.473823,-9.299992);
 insert into item values (17,'Descricao do item 17','Santarem',41.298323,-8.237823);
-insert into item values (18,'Descricao duplicado 2','Beja',40.283765,-9.248372);
+insert into item values (18,'Descricao duplicado 2','Beja',38.283765,-9.248372);
 insert into item values (19,'Descricao do item 19','Lisboa',39.991734,-8.283723);
-insert into item values (20,'Descricao do item 20','Vila Real',41.127382,-9.283782);
+insert into item values (20,'Descricao do item 20','Vila Real',38.127382,-9.283782);
+insert into item values (21,'Descricao do item 21','Lisboa',39.991734,-8.283723);
+insert into item values (22,'Descricao do item 22','Santarem',41.298323,-8.237823);
+insert into item values (23,'Descricao do item 23','Porto',39.346731,-8.219823);
 
 /*Anomalias*/
 
@@ -56,6 +59,9 @@ insert into anomalia values (17,'((17,10),(19,15))','url-imagem17','Espanhol','2
 insert into anomalia values (18,'((18,19),(25,25))','url-imagem18','Ingles','2019-6-6 18:16:18','Descricao da anomalia 18', false);
 insert into anomalia values (19,'((19,12),(25,21))','url-imagem19','Portugues','2019-7-5 19:59:23','Descricao da anomalia 19', true);
 insert into anomalia values (20,'((20,21),(25,26))','url-imagem20','Espanhol','2019-8-4 20:59:38','Descricao da anomalia 20', false);
+insert into anomalia values (21,'((21,22),(26,27))','url-imagem21','Ingles','2019-4-4 20:56:58','Descricao da anomalia 21', false);
+insert into anomalia values (22,'((22,22),(28,27))','url-imagem22','Ingles','2019-7-4 19:56:58','Descricao da anomalia 22', true);
+insert into anomalia values (23,'((23,22),(26,27))','url-imagem23','Ingles','2019-4-5 18:56:58','Descricao da anomalia 23', true);
 
 /*Anomalias de traducao*/
 
@@ -69,6 +75,7 @@ insert into anomalia_traducao values (14,'((0,0),(4,5))','Ingles');
 insert into anomalia_traducao values (16,'((7,7),(9,9))','Ingles');
 insert into anomalia_traducao values (18,'((26,27),(30,35))','Italiano');
 insert into anomalia_traducao values (20,'((3,0),(9,10))','Ingles');
+insert into anomalia_traducao values (21,'((3,3),(8,11))','Espanhol');
 
 /*Duplicados*/
 
@@ -148,6 +155,9 @@ insert into incidencia values (17,17,'robalo@hotmail.com');
 insert into incidencia values (18,18,'josejose@hotmail.com');
 insert into incidencia values (19,19,'burnol@gmail.com');
 insert into incidencia values (20,20,'costa@gov.pt');
+insert into incidencia values (21,21,'tavares@sapo.pt');
+insert into incidencia values (22,22,'tavares@sapo.pt');
+insert into incidencia values (23,23,'tavares@sapo.pt');
 
 /*Propostas de Correcao*/
 
