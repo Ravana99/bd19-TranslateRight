@@ -100,7 +100,7 @@ create table proposta_de_correcao (
 create table correcao (
     email varchar(100) not null,
     nro integer not null,
-    anomalia_id serial not null,
+    anomalia_id integer not null,
     constraint pk_correcao primary key(email, nro, anomalia_id),
     constraint fk_correcao_proposta_de_correcao foreign key(email, nro) references proposta_de_correcao(email, nro) on delete cascade,
     constraint fk_correcao_incidencia foreign key(anomalia_id) references incidencia(anomalia_id) on delete cascade
