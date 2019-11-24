@@ -285,6 +285,8 @@ insert into proposta_de_correcao values ('josejose@hotmail.com',1,'2019-3-21 10:
 insert into proposta_de_correcao values ('matos@sapo.pt',1,'2019-2-20 15:31:59','Texto1 do matos');
 insert into proposta_de_correcao values ('carlos@hotmail.com',1,'2019-7-19 02:22:22','Texto1 do carlos');
 insert into proposta_de_correcao values ('joao2@gmail.com',1,'2019-3-13 13:13:31','Texto1 do joao2');
+insert into proposta_de_correcao values ('vera@gmail.com',1,'2019-7-13 13:53:21','Texto1 da vera');
+insert into proposta_de_correcao values ('carlos2@sapo.pt',1,'2019-8-13 23:13:31','Texto1 do carlos2');
 
 /*Correcoes*/
 
@@ -298,3 +300,5 @@ insert into correcao values ('josejose@hotmail.com',1,2);
 insert into correcao values ('matos@sapo.pt',1,13);
 insert into correcao values ('carlos@hotmail.com',1,4);
 insert into correcao values ('joao2@gmail.com',1,1);
+insert into correcao values ('vera@gmail.com',1,6);
+insert into correcao values ('carlos2@sapo.pt',1,5);
