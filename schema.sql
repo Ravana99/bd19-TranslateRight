@@ -39,7 +39,7 @@ create table anomalia (
 );
 
 create table anomalia_traducao (
-    id serial not null unique,
+    id integer not null unique,
     zona2 box not null,
     lingua2 varchar(100) not null,
     constraint pk_anomalia_traducao primary key(id),
@@ -48,8 +48,8 @@ create table anomalia_traducao (
 /* Missing constraints RI-1 and RI-2 */
 
 create table duplicado (
-    item1 serial not null,
-    item2 serial not null,
+    item1 integer not null,
+    item2 integer not null,
     constraint pk_duplicado primary key(item1, item2),
     constraint fk_duplicado_item1 foreign key(item1) references item(id) on delete cascade,
     constraint fk_duplicado_item2 foreign key(item2) references item(id) on delete cascade
@@ -78,8 +78,8 @@ create table utilizador_regular (
 /* Missing constraint RI-6 */
 
 create table incidencia (
-    anomalia_id serial not null unique,
-    item_id serial not null,
+    anomalia_id integer not null unique,
+    item_id integer not null,
     email varchar(100) not null,
     constraint pk_incidencia primary key(anomalia_id),
     constraint fk_incidencia_anomalia foreign key(anomalia_id) references anomalia(id) on delete cascade,
