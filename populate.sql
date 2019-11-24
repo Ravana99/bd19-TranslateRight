@@ -36,6 +36,11 @@ insert into item values (20,'Descricao do item 20','Vila Real',38.127382,-9.2837
 insert into item values (21,'Descricao do item 21','Lisboa',39.991734,-8.283723);
 insert into item values (22,'Descricao do item 22','Santarem',41.298323,-8.237823);
 insert into item values (23,'Descricao do item 23','Porto',39.346731,-8.219823);
+insert into item values (24,'Descricao do item 24','Beja',38.283765,-9.248372);
+insert into item values (25,'Descricao do item 25','Porto',39.346731,-8.219823);
+insert into item values (26,'Descricao do item 26','Santarem',41.298323,-8.237823);
+insert into item values (27,'Descricao do item 27','Porto',39.346731,-8.219823);
+insert into item values (28,'Descricao do item 28','Santarem',41.298323,-8.237823);
 
 /*Anomalias*/
 
@@ -62,6 +67,11 @@ insert into anomalia values (20,'((20,21),(25,26))','url-imagem20','Espanhol','2
 insert into anomalia values (21,'((21,22),(26,27))','url-imagem21','Ingles','2019-4-4 20:56:58','Descricao da anomalia 21', false);
 insert into anomalia values (22,'((22,22),(28,27))','url-imagem22','Ingles','2019-7-4 19:56:58','Descricao da anomalia 22', true);
 insert into anomalia values (23,'((23,22),(26,27))','url-imagem23','Ingles','2019-4-5 18:56:58','Descricao da anomalia 23', true);
+insert into anomalia values (24,'((24,29),(30,36))','url-imagem24','Italiano','2019-2-25 14:55:43','Descricao da anomalia 24', false);
+insert into anomalia values (25,'((25,29),(32,36))','url-imagem25','Italiano','2019-5-4 21:52:45','Descricao da anomalia 25', false);
+insert into anomalia values (26,'((26,30),(36,37))','url-imagem26','Espanhol','2019-9-25 17:12:18','Descricao da anomalia 26', false);
+insert into anomalia values (27,'((27,13),(30,21))','url-imagem27','Ingles','2019-3-11 14:34:54','Descricao da anomalia 27', true);
+insert into anomalia values (28,'((28,15),(34,23))','url-imagem28','Ingles','2019-1-14 23:42:34','Descricao da anomalia 28', true);
 
 /*Anomalias de traducao*/
 
@@ -76,6 +86,9 @@ insert into anomalia_traducao values (16,'((7,7),(9,9))','Ingles');
 insert into anomalia_traducao values (18,'((26,27),(30,35))','Italiano');
 insert into anomalia_traducao values (20,'((3,0),(9,10))','Ingles');
 insert into anomalia_traducao values (21,'((3,3),(8,11))','Espanhol');
+insert into anomalia_traducao values (24,'((3,5),(9,11))','Espanhol');
+insert into anomalia_traducao values (25,'((6,5),(9,11))','Ingles');
+insert into anomalia_traducao values (26,'((0,0),(7,10))','Ingles');
 
 /*Duplicados*/
 
@@ -158,6 +171,11 @@ insert into incidencia values (20,20,'costa@gov.pt');
 insert into incidencia values (21,21,'tavares@sapo.pt');
 insert into incidencia values (22,22,'tavares@sapo.pt');
 insert into incidencia values (23,23,'tavares@sapo.pt');
+insert into incidencia values (24,24,'tvi@gmail.com');
+insert into incidencia values (25,25,'burnol@gmail.com');
+insert into incidencia values (26,26,'tavares@sapo.pt');
+insert into incidencia values (27,27,'josefino@gmail.com');
+insert into incidencia values (28,28,'josefino@gmail.com');
 
 /*Propostas de Correcao*/
 
@@ -171,6 +189,8 @@ insert into proposta_de_correcao values ('josejose@hotmail.com',1,'2019-3-21 10:
 insert into proposta_de_correcao values ('matos@sapo.pt',1,'2019-2-20 15:31:59','Texto1 do matos');
 insert into proposta_de_correcao values ('carlos@hotmail.com',1,'2019-7-19 02:22:22','Texto1 do carlos');
 insert into proposta_de_correcao values ('joao2@gmail.com',1,'2019-3-13 13:13:31','Texto1 do joao2');
+insert into proposta_de_correcao values ('vera@gmail.com',1,'2019-7-13 13:53:21','Texto1 da vera');
+insert into proposta_de_correcao values ('carlos2@sapo.pt',1,'2019-8-13 23:13:31','Texto1 do carlos2');
 
 /*Correcoes*/
 
@@ -184,3 +204,5 @@ insert into correcao values ('josejose@hotmail.com',1,2);
 insert into correcao values ('matos@sapo.pt',1,13);
 insert into correcao values ('carlos@hotmail.com',1,4);
 insert into correcao values ('joao2@gmail.com',1,1);
+insert into correcao values ('vera@gmail.com',1,6);
+insert into correcao values ('carlos2@sapo.pt',1,5);

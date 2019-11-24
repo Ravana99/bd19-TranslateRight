@@ -14,7 +14,7 @@ HAVING COUNT(*)>=ALL (
 /*Query #2*/
 
 SELECT email 
-FROM anomalia NATURAL JOIN anomalia_traducao NATURAL JOIN incidencia NATURAL JOIN utilizador_regular 
+FROM anomalia NATURAL JOIN anomalia_traducao,incidencia NATURAL JOIN utilizador_regular 
 WHERE ts>='2019-01-01 00:00:00' AND 
       ts<='2019-06-30 23:59:59' AND 
       id=anomalia_id 
