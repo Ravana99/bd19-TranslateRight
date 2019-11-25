@@ -36,19 +36,53 @@
         echo "<h3>Escolha os dois locais</h3>";
         echo "<input type=\"hidden\" name=\"action\" value=\"showIncidencias\"/></p>";
 
-        echo "<p>Local Publico 1: <input type=\"text\" name=\"local1\"/></p>";
-        echo "<p>Local Publico 2: <input type=\"text\" name=\"local2\"/></p>";
+        echo "<p>Nome do Local Publico 1: <input type=\"text\" name=\"local1_name\"/></p>";
+        echo "<p>Nome do Local Publico 2: <input type=\"text\" name=\"local2_name\"/></p>";
 
         echo "<input type=\"submit\" value=\"Listar anomalias\"/>";
         echo "</form>";
         echo ("</div>");
     }
 
-    function showIncidencias($db)
+    function showIncidencias($db, $local1_nome, $local2_nome)
     {
-        $local_publico = "SELECT latitude,longitude,nome FROM local_publico";
-        $item = "SELECT id,descricao,localizacao,latitude,longitude FROM item";
-        $anomalia = "SELECT id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao FROM anomalia";
+        $local1 = "SELECT latitude as latitude1, longitude as longitude1 
+        FROM local_publico WHERE nome=:local1_nome";
+
+        $result = $db->prepare($local1);
+        $result->execute([':local1_nome' => $local1_nome]);
+        foreach ($result as $row) {
+            $latitude1 = $row['latitude1'];
+            $longitude1 = $row['longitude1'];
+            console_log($latitude1);
+            console_log($longitude1);
+        }
+
+        $local2 = "SELECT latitude as latitude2, longitude as longitude2 
+        FROM local_publico WHERE nome=:local2_nome";
+
+        $result = $db->prepare($local2);
+        $result->execute([':local2_nome' => $local2_nome]);
+        foreach ($result as $row) {
+            $latitude2 = $row['latitude2'];
+            $longitude2 = $row['longitude2'];
+            console_log($latitude2);
+            console_log($longitude2);
+        }
+
+        $latitude1 < $latitude2 ? ($minLatitude = $latitude1) && ($maxLatitude = $latitude2)
+            : ($minLatitude = $latitude2) && ($maxLatitude = $latitude1);
+        $longitude1 < $longitude2 ? ($minLongitude = $longitude1) && ($maxLongitude = $longitude2)
+            : ($minLongitude = $longitude2) && ($maxLongitude = $longitude1);
+
+        console_log($minLatitude);
+        console_log($maxLatitude);
+        console_log($minLongitude);
+        console_log($maxLongitude);
+
+
+
+        $anomalia = "SELECT id,descricao,localizacao,latitude,longitude FROM item WHERE latitude";
 
         $result = $db->prepare($local_publico);
         $result->execute();
@@ -94,7 +128,7 @@
 
         switch ($_GET['action']) {
             case "showIncidencias":
-                showIncidencias($db, $_GET['local1'], $_GET['local2']);
+                showIncidencias($db, $_GET['local1_name'], $_GET['local2_name']);
                 break;
             default:
                 showForm();
