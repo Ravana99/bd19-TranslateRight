@@ -26,7 +26,7 @@
 
         $utilizador = "SELECT email FROM utilizador";
 
-        $result = $db->prepare($utlizador);
+        $result = $db->prepare($utilizador);
         $result->execute();
 
         echo ("<div style=\"display:flex; flex-direction:column;align-items:center; text-align:center;\">");

@@ -10,34 +10,96 @@
 
 <body>
     <?php
+    function console_log($data)
+    {
+        echo '<script>';
+        echo 'console.log(' . json_encode($data) . ')';
+        echo '</script>';
+    }
+
+    function ShowForm()
+    {
+        echo ("<div style=\"
+        width:400px;
+        height:400px;
+        background-color:red;
+        position:absolute;
+        left:50%;
+        top:50%;
+        transform:translate(-50%,-50%);
+        display:flex; 
+        flex-direction:column;
+        align-items:center; 
+        text-align:center;\">");
+
+        echo "<form name=\"form\" method=\"get\">";
+        echo "<h3>Escolha os dois locais</h3>";
+        echo "<input type=\"hidden\" name=\"action\" value=\"showIncidencias\"/></p>";
+
+        echo "<p>Local Publico 1: <input type=\"text\" name=\"local1\"/></p>";
+        echo "<p>Local Publico 2: <input type=\"text\" name=\"local2\"/></p>";
+
+        echo "<input type=\"submit\" value=\"Listar anomalias\"/>";
+        echo "</form>";
+        echo ("</div>");
+    }
+
+    function showIncidencias($db)
+    {
+        $local_publico = "SELECT latitude,longitude,nome FROM local_publico";
+        $item = "SELECT id,descricao,localizacao,latitude,longitude FROM item";
+        $anomalia = "SELECT id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao FROM anomalia";
+
+        $result = $db->prepare($local_publico);
+        $result->execute();
+
+        echo ("<div style=\"display:flex; flex-direction:column;align-items:center; text-align:center;\">");
+        echo ("<div>");
+        echo ("<h3>Local Publico</h3>");
+        echo ("<table border=\"1\">\n");
+        echo ("<tr>");
+        echo ("<td>nome</td>\n");
+        echo ("<td>longitude</td>\n");
+        echo ("<td>latitude</td>\n");
+        echo ("</tr>\n");
+        foreach ($result as $row) {
+            $latitude = $row['latitude'];
+            $longitude = $row['longitude'];
+            echo ("<tr>");
+            echo ("<td>{$row['nome']}</td>\n");
+            echo ("<td>{$row['longitude']}</td>\n");
+            echo ("<td>{$row['latitude']}</td>\n");
+            echo ("<td><a href=\"a.php?action=deleteLocalPublico&latitude=$latitude&longitude=$longitude\">
+        <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/>
+        </a></td>");
+            echo ("</tr>\n");
+        }
+        echo ("</table>\n");
+        echo ("<a href=\"a.php?action=showForm&tableName=local_publico\">
+    <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
+    </a>");
+        echo ("</div></div>");
+
+        $db = null;
+    }
+
     try {
         $host = "db.ist.utl.pt";
         $user = "ist189476";
         $password = "bd123";
         $dbname = $user;
 
-
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $sql = "SELECT * FROM local_publico, item, duplicado";
-        $result = $db->prepare($sql);
-        $result->execute();
-
-        echo ("<table border=\"1\">\n");
-        echo ("<tr><td>local_publico</td><td>item</td><td>duplicado</td></tr>\n");
-        foreach ($result as $row) {
-            echo ("<tr><td>");
-            echo ($row['local_publico']);
-            echo ("</td><td>");
-            echo ($row['item']);
-            echo ("</td><td>");
-            echo ($row['duplicado']);
-            echo ("</td></tr>\n");
+        switch ($_GET['action']) {
+            case "showIncidencias":
+                showIncidencias($db, $_GET['local1'], $_GET['local2']);
+                break;
+            default:
+                showForm();
+                break;
         }
-        echo ("</table>\n");
-
-        $db = null;
     } catch (PDOException $e) {
         echo ("<p>ERROR: {$e->getMessage()}</p>");
     }

@@ -16,19 +16,19 @@
         echo '</script>';
     }
 
-    function registerIncidencia($db, $anomalia_id, $item_id, $email)
+    function registerIncidencia($db, $item_id, $email)
     {
-        $sql = "INSERT INTO incidencia (anomalia_id,item_id,email) VALUES (:anomalia_id,item_id,email)";
+        $sql = "INSERT INTO incidencia (anomalia_id,item_id,email) VALUES (default,item_id,email)";
         $result = $db->prepare($sql);
-        $result->execute([':anomalia_id' => $anomalia_id, ':item_id' => $item_id, ':email' => $email]);
-        header("Location:/a.php");
+        $result->execute([':item_id' => $item_id, ':email' => $email]);
+        header("Location:/d.php");
     }
     function registerDuplicado($db, $item1, $item2)
     {
         $sql = "INSERT INTO duplicado (item1,item2) VALUES (:item1,:item2)";
         $result = $db->prepare($sql);
         $result->execute([':item1' => $item1, ':item2' => $item2]);
-        header("Location:/a.php");
+        header("Location:/d.php");
     }
 
     function ShowForm($tableName, $add) #add is a flag, 1 if adding, 0 if editing
@@ -75,7 +75,7 @@
 
         switch ($_GET['action']) {
             case "registerIncidencia":
-                registerIncidencia($db, $_GET['anomalia_id'], $_GET['item_id'],  $_GET['email']);
+                registerIncidencia($db, $_GET['item_id'],  $_GET['email']);
                 break;
             case "registerDuplicado":
                 registerDuplicado($db,  $_GET['item1'], $_GET['item2']);
@@ -112,7 +112,7 @@
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"a.php?action=showForm&tableName=incidencia\">
+        echo ("<a href=\"d.php?action=showForm&tableName=incidencia\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
@@ -136,7 +136,7 @@
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"a.php?action=showForm&tableName=duplicado\">
+        echo ("<a href=\"d.php?action=showForm&tableName=duplicado\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
