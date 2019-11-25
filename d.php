@@ -4,7 +4,7 @@
     <a href="index.php">
         <h1>Base de Dados 2019/2020 Parte III</h1>
     </a>
-    <h3>Registar inncidencias e duplicados</h3>
+    <h3>Registar incidencias e duplicados</h3>
 </header>
 
 <body>
@@ -75,10 +75,10 @@
 
         switch ($_GET['action']) {
             case "registerIncidencia":
-                registerIncidencia($db, $_GET['item_id'],  $_GET['email']);
+                registerIncidencia($db, $_GET['item_id'], $_GET['email']);
                 break;
             case "registerDuplicado":
-                registerDuplicado($db,  $_GET['item1'], $_GET['item2']);
+                registerDuplicado($db, $_GET['item1'], $_GET['item2']);
                 break;
 
             case "showForm":

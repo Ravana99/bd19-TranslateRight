@@ -80,9 +80,8 @@
         console_log($minLongitude);
         console_log($maxLongitude);
 
-
-
-        $anomalia = "SELECT id,descricao,localizacao,latitude,longitude FROM item WHERE latitude";
+        $anomalia = "SELECT anomalia_id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao,item_id
+        FROM incidencia,anomalia,item WHERE anomalia_id=:anomalia_id and item_id=:item_id ";
 
         $result = $db->prepare($local_publico);
         $result->execute();
