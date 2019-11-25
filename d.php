@@ -16,11 +16,11 @@
         echo '</script>';
     }
 
-    function registerIncidencia($db, $item_id, $email)
+    function registerIncidencia($db, $anomalia_id, $item_id, $email)
     {
-        $sql = "INSERT INTO incidencia (anomalia_id,item_id,email) VALUES (default,item_id,email)";
+        $sql = "INSERT INTO incidencia (anomalia_id,item_id,email) VALUES (:anomalia_id,:item_id,:email)";
         $result = $db->prepare($sql);
-        $result->execute([':item_id' => $item_id, ':email' => $email]);
+        $result->execute([':anomalia_id' => $anomalia_id, ':item_id' => $item_id, ':email' => $email]);
         header("Location:/d.php");
     }
     function registerDuplicado($db, $item1, $item2)
@@ -31,7 +31,7 @@
         header("Location:/d.php");
     }
 
-    function ShowForm($tableName, $add) #add is a flag, 1 if adding, 0 if editing
+    function ShowForm($tableName)
     {
         echo ("<div style=\"
         width:400px;
@@ -75,7 +75,7 @@
 
         switch ($_GET['action']) {
             case "registerIncidencia":
-                registerIncidencia($db, $_GET['item_id'], $_GET['email']);
+                registerIncidencia($db, $_GET['anomalia_id'], $_GET['item_id'], $_GET['email']);
                 break;
             case "registerDuplicado":
                 registerDuplicado($db, $_GET['item1'], $_GET['item2']);
