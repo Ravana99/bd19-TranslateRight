@@ -26,49 +26,67 @@
         }
         $nro += 1;
 
-        $sql = "INSERT INTO proposta_de_correcao (email,nro,data_hora,texto) 
-        VALUES (:email,:nro,:data_hora,:texto)";
-        $result = $db->prepare($sql);
-        $result->execute([':email' => $email, ':nro' => $nro, ':data_hora' => date('Y-m-d H:i:s'), ':texto' => $texto]);
+        try {
+            $sql->beginTransaction();
 
-        $sql = "INSERT INTO correcao (email,nro,anomalia_id) VALUES (:email,:nro,:anomalia_id)";
-        $result = $db->prepare($sql);
-        $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+            $sql = "INSERT INTO proposta_de_correcao (email,nro,data_hora,texto) 
+        VALUES (:email,:nro,:data_hora,:texto)";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro, ':data_hora' => date('Y-m-d H:i:s'), ':texto' => $texto]);
+
+            $sql = "INSERT INTO correcao (email,nro,anomalia_id) VALUES (:email,:nro,:anomalia_id)";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+
+            $db->commit();
+        } catch (PDOException $e) {
+            $db->rollBack();
+            echo ("<p>ERROR: {$e->getMessage()}</p>");
+        }
+
 
         header("Location:b.php");
     }
     function editEntry($db, $email, $nro, $anomalia_id, $texto, $email_old, $anomalia_id_old, $texto_old)
     {
-        #if value is null, value in db stays unchanged
-        if ($email) {
-            $sql = "UPDATE correcao SET email = :email WHERE email = :email_old and nro=:nro and anomalia_id=:anomalia_id_old;";
-            $result = $db->prepare($sql);
-            $result->execute([
-                ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':anomalia_id_old' => $anomalia_id_old
-            ]);
+        try {
+            $sql->beginTransaction();
+            #if value is null, value in db stays unchanged
+            if ($email) {
+                $sql = "UPDATE correcao SET email = :email WHERE email = :email_old and nro=:nro and anomalia_id=:anomalia_id_old;";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':anomalia_id_old' => $anomalia_id_old
+                ]);
 
-            $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old and nro=:nro;";
-            $result = $db->prepare($sql);
-            $result->execute([
-                ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
-            ]);
-        } else {
-            $email = $email_old;
-        }
+                $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old and nro=:nro;";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
+                ]);
+            } else {
+                $email = $email_old;
+            }
 
-        if ($anomalia_id) {
-            $sql = "UPDATE correcao SET anomalia_id = :anomalia_id WHERE email = :email and nro=:nro and anomalia_id=:anomalia_id_old;";
-            $result = $db->prepare($sql);
-            $result->execute([
-                ':anomalia_id' => $anomalia_id, ':email' => $email, ':nro' => $nro, ':anomalia_id_old' => $anomalia_id_old
-            ]);
-        }
-        if ($texto) {
-            $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email and nro=:nro;";
-            $result = $db->prepare($sql);
-            $result->execute([
-                ':texto' => $texto, ':email' => $email, ':nro' => $nro
-            ]);
+            if ($anomalia_id) {
+                $sql = "UPDATE correcao SET anomalia_id = :anomalia_id WHERE email = :email and nro=:nro and anomalia_id=:anomalia_id_old;";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':anomalia_id' => $anomalia_id, ':email' => $email, ':nro' => $nro, ':anomalia_id_old' => $anomalia_id_old
+                ]);
+            }
+            if ($texto) {
+                $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email and nro=:nro;";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':texto' => $texto, ':email' => $email, ':nro' => $nro
+                ]);
+            }
+
+            $db->commit();
+        } catch (PDOException $e) {
+            $db->rollBack();
+            echo ("<p>ERROR: {$e->getMessage()}</p>");
         }
         header("Location:b.php");
     }

@@ -25,6 +25,13 @@
     }
     function registerDuplicado($db, $item1, $item2)
     {
+        #to make sure that item1 is the one with the lowest id
+        if ($item1 > $item2) {
+            $temp = $item1;
+            $item1 = $item2;
+            $item2 = $temp;
+        }
+
         $sql = "INSERT INTO duplicado (item1,item2) VALUES (:item1,:item2)";
         $result = $db->prepare($sql);
         $result->execute([':item1' => $item1, ':item2' => $item2]);
