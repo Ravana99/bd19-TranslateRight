@@ -49,9 +49,10 @@
     function showAnomalias($db, $latitude, $longitude, $dx, $dy)
     {
         $anomalias = "SELECT anomalia.id,zona,imagem,lingua,ts,anomalia.descricao,tem_anomalia_redacao
-        FROM incidencia,anomalia,item WHERE anomalia.id=anomalia_id and item.id=item_id and 
-        latitude>=:minLatitude and latitude<=:maxLatitude and 
-        longitude>=:minLongitude and longitude<=:maxLongitude";
+        FROM incidencia,anomalia,item WHERE anomalia.id=anomalia_id AND item.id=item_id AND 
+        latitude>=:minLatitude AND latitude<=:maxLatitude AND 
+        longitude>=:minLongitude AND longitude<=:maxLongitude AND
+        ts>=CURRENT_DATE-interval '3 month' AND ts<=CURRENT_DATE";
 
         $result = $db->prepare($anomalias);
         $result->execute([

@@ -18,16 +18,18 @@
 
     function addEntry($db, $email, $anomalia_id, $texto)
     {
-        $sql = "SELECT count(*) AS total FROM proposta_de_correcao WHERE email=:email GROUP BY email";
+        $sql = "SELECT nro AS total FROM proposta_de_correcao WHERE email=:email AND
+                nro>=ALL(SELECT nro FROM proposta_de_correcao WHERE email=:email);";
         $result = $db->prepare($sql);
         $result->execute([':email' => $email]);
+        $nro = 0;
         foreach ($result as $row) {
             $nro = $row['total'];
         }
         $nro += 1;
 
         try {
-            $sql->beginTransaction();
+            $db->beginTransaction();
 
             $sql = "INSERT INTO proposta_de_correcao (email,nro,data_hora,texto) 
         VALUES (:email,:nro,:data_hora,:texto)";
@@ -50,16 +52,16 @@
     function editEntry($db, $email, $nro, $anomalia_id, $texto, $email_old, $anomalia_id_old, $texto_old)
     {
         try {
-            $sql->beginTransaction();
+            $db->beginTransaction();
             #if value is null, value in db stays unchanged
             if ($email) {
-                $sql = "UPDATE correcao SET email = :email WHERE email = :email_old and nro=:nro and anomalia_id=:anomalia_id_old;";
+                $sql = "UPDATE correcao SET email = :email WHERE email = :email_old AND nro=:nro AND anomalia_id=:anomalia_id_old;";
                 $result = $db->prepare($sql);
                 $result->execute([
                     ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':anomalia_id_old' => $anomalia_id_old
                 ]);
 
-                $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old and nro=:nro;";
+                $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old AND nro=:nro;";
                 $result = $db->prepare($sql);
                 $result->execute([
                     ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
@@ -69,14 +71,14 @@
             }
 
             if ($anomalia_id) {
-                $sql = "UPDATE correcao SET anomalia_id = :anomalia_id WHERE email = :email and nro=:nro and anomalia_id=:anomalia_id_old;";
+                $sql = "UPDATE correcao SET anomalia_id = :anomalia_id WHERE email = :email AND nro=:nro AND anomalia_id=:anomalia_id_old;";
                 $result = $db->prepare($sql);
                 $result->execute([
                     ':anomalia_id' => $anomalia_id, ':email' => $email, ':nro' => $nro, ':anomalia_id_old' => $anomalia_id_old
                 ]);
             }
             if ($texto) {
-                $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email and nro=:nro;";
+                $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email AND nro=:nro;";
                 $result = $db->prepare($sql);
                 $result->execute([
                     ':texto' => $texto, ':email' => $email, ':nro' => $nro
@@ -93,7 +95,7 @@
 
     function deleteEntry($db, $email, $nro)
     {
-        $sql = "DELETE from proposta_de_correcao WHERE email = :email and nro = :nro;";
+        $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro;";
         $result = $db->prepare($sql);
         $result->execute([':email' => $email, ':nro' => $nro]);
         header("Location:b.php");
@@ -170,7 +172,7 @@
                 break;
 
             case "showForm":
-                ShowForm($_GET['tableName'], $_GET['add']);
+                ShowForm($_GET['add']);
                 break;
         }
 

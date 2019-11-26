@@ -18,14 +18,14 @@
 
     function addEntry_LocalPublico($db, $latitude, $longitude, $nome)
     {
-        $sql = "INSERT INTO local_publico (nome,longitude,latitude) VALUES (:nome,:longitude,:latitude)";
+        $sql = "INSERT INTO local_publico (nome,latitude,longitude) VALUES (:nome,:latitude,:longitude)";
         $result = $db->prepare($sql);
-        $result->execute([':nome' => $nome, ':longitude' => $longitude, ':latitude' => $latitude]);
+        $result->execute([':nome' => $nome, ':latitude' => $latitude, ':longitude' => $longitude]);
         header("Location:/a.php");
     }
     function deleteEntry_LocalPublico($db, $latitude, $longitude)
     {
-        $sql = "DELETE from local_publico WHERE latitude = :latitude and longitude = :longitude;";
+        $sql = "DELETE FROM local_publico WHERE latitude = :latitude AND longitude = :longitude;";
         $result = $db->prepare($sql);
         $result->execute([':latitude' => $latitude, ':longitude' => $longitude]);
         header("Location:/a.php");
@@ -33,15 +33,15 @@
 
     function addEntry_Item($db, $descricao, $localizacao, $latitude, $longitude)
     {
-        $sql = "INSERT INTO item (id,descricao,localizacao,longitude,latitude) 
-        VALUES (default,:descricao,:localizacao,:longitude,:latitude)";
+        $sql = "INSERT INTO item (id,descricao,localizacao,latitude,longitude) 
+        VALUES (default,:descricao,:localizacao,:latitude,:longitude)";
         $result = $db->prepare($sql);
-        $result->execute([':descricao' => $descricao,  ':localizacao' => $localizacao, ':longitude' => $longitude, ':latitude' => $latitude]);
+        $result->execute([':descricao' => $descricao,  ':localizacao' => $localizacao, ':latitude' => $latitude, ':longitude' => $longitude]);
         header("Location:/a.php");
     }
     function deleteEntry_Item($db, $id)
     {
-        $sql = "DELETE from item WHERE id = :id;";
+        $sql = "DELETE FROM item WHERE id = :id;";
         $result = $db->prepare($sql);
         $result->execute([':id' => $id]);
         header("Location:/a.php");
@@ -63,7 +63,7 @@
     }
     function deleteEntry_Anomalia($db, $id)
     {
-        $sql = "DELETE from anomalia WHERE id = :id;";
+        $sql = "DELETE FROM anomalia WHERE id = :id;";
         $result = $db->prepare($sql);
         $result->execute([':id' => $id]);
         header("Location:/a.php");
@@ -89,16 +89,16 @@
             echo "<h3>Adicionar um local publico</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addLocalPublico\"/></p>";
             echo "<p>Nome: <input type=\"text\" name=\"nome\"/></p>";
-            echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
             echo "<p>Latitude: <input type=\"text\" name=\"latitude\"/></p>";
+            echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
         } else if ($tableName == 'item') {
             echo "<h3>Adicionar um item</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addItem\"/></p>";
 
             echo "<p>Descrição: <input type=\"text\" name=\"descricao\"/></p>";
             echo "<p>Localização: <input type=\"text\" name=\"localizacao\"/></p>";
-            echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
             echo "<p>Latitude: <input type=\"text\" name=\"latitude\"/></p>";
+            echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
         } else {
             echo "<h3>Adicionar uma anomalia</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
@@ -179,16 +179,16 @@
         echo ("<table border=\"1\">\n");
         echo ("<tr>");
         echo ("<td>nome</td>\n");
-        echo ("<td>longitude</td>\n");
         echo ("<td>latitude</td>\n");
+        echo ("<td>longitude</td>\n");
         echo ("</tr>\n");
         foreach ($result as $row) {
             $latitude = $row['latitude'];
             $longitude = $row['longitude'];
             echo ("<tr>");
             echo ("<td>{$row['nome']}</td>\n");
-            echo ("<td>{$row['longitude']}</td>\n");
             echo ("<td>{$row['latitude']}</td>\n");
+            echo ("<td>{$row['longitude']}</td>\n");
             echo ("<td><a href=\"a.php?action=deleteLocalPublico&latitude=$latitude&longitude=$longitude\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/>
             </a></td>");
@@ -210,8 +210,8 @@
         echo ("<td>id</td>\n");
         echo ("<td>descricao</td>\n");
         echo ("<td>localizacao</td>\n");
-        echo ("<td>longitude</td>\n");
         echo ("<td>latitude</td>\n");
+        echo ("<td>longitude</td>\n");
         echo ("</tr>\n");
         foreach ($result as $row) {
             $id = $row['id'];
@@ -219,8 +219,8 @@
             echo ("<td>{$row['id']}</td>\n");
             echo ("<td>{$row['descricao']}</td>\n");
             echo ("<td>{$row['localizacao']}</td>\n");
-            echo ("<td>{$row['longitude']}</td>\n");
             echo ("<td>{$row['latitude']}</td>\n");
+            echo ("<td>{$row['longitude']}</td>\n");
             echo ("<td><a href=\"a.php?action=deleteItem&id=$id\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
             echo ("</tr>\n");

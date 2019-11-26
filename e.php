@@ -46,7 +46,7 @@
 
     function showAnomalias($db, $local1_nome, $local2_nome)
     {
-        $local1 = "SELECT latitude as latitude1, longitude as longitude1 
+        $local1 = "SELECT latitude AS latitude1, longitude AS longitude1 
         FROM local_publico WHERE nome=:local1_nome";
 
         $result = $db->prepare($local1);
@@ -56,7 +56,7 @@
             $longitude1 = $row['longitude1'];
         }
 
-        $local2 = "SELECT latitude as latitude2, longitude as longitude2 
+        $local2 = "SELECT latitude AS latitude2, longitude AS longitude2 
         FROM local_publico WHERE nome=:local2_nome";
 
         $result = $db->prepare($local2);
@@ -77,9 +77,9 @@
         #console_log($maxLongitude);
 
         $anomalias = "SELECT anomalia.id,zona,imagem,lingua,ts,anomalia.descricao,tem_anomalia_redacao
-        FROM incidencia,anomalia,item WHERE anomalia.id=anomalia_id and item.id=item_id and 
-        latitude>=:minLatitude and latitude<=:maxLatitude and 
-        longitude>=:minLongitude and longitude<=:maxLongitude";
+        FROM incidencia,anomalia,item WHERE anomalia.id=anomalia_id AND item.id=item_id AND 
+        latitude>=:minLatitude AND latitude<=:maxLatitude AND 
+        longitude>=:minLongitude AND longitude<=:maxLongitude";
 
         $result = $db->prepare($anomalias);
         $result->execute([

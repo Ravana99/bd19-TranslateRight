@@ -25,13 +25,16 @@
     }
     function registerDuplicado($db, $item1, $item2)
     {
+        /*
         #to make sure that item1 is the one with the lowest id
+
         if ($item1 > $item2) {
             $temp = $item1;
             $item1 = $item2;
             $item2 = $temp;
         }
-
+        */
+        
         $sql = "INSERT INTO duplicado (item1,item2) VALUES (:item1,:item2)";
         $result = $db->prepare($sql);
         $result->execute([':item1' => $item1, ':item2' => $item2]);
@@ -63,8 +66,8 @@
         } else {
             echo "<h3>Registar um duplicado</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"registerDuplicado\"/></p>";
-            echo "<p>Item Original: <input type=\"text\" name=\"item2\"/></p>";
-            echo "<p>Item Duplicado: <input type=\"text\" name=\"item1\"/></p>";
+            echo "<p>Item Original: <input type=\"text\" name=\"item1\"/></p>";
+            echo "<p>Item Duplicado: <input type=\"text\" name=\"item2\"/></p>";
         }
         echo "<input type=\"submit\" value=\"Adicionar\"/>";
         echo "</form>";
@@ -94,7 +97,7 @@
         }
 
         $incidencia = "SELECT anomalia_id,item_id,email FROM incidencia";
-        $duplicado = "SELECT item1,item2 FROM duplicado";
+        $duplicado = "SELECT item1,item2 FROM duplicado ORDER BY item1 ASC, item2 ASC";
 
         $result = $db->prepare($incidencia);
         $result->execute();
@@ -131,8 +134,8 @@
         echo ("<h3>Duplicados</h3>");
         echo ("<table border=\"1\">\n");
         echo ("<tr>");
-        echo ("<td>Duplicado</td>\n");
         echo ("<td>Original</td>\n");
+        echo ("<td>Duplicado</td>\n");
         echo ("</tr>\n");
         foreach ($result as $row) {
             $item1 = $row['item1'];

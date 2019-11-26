@@ -46,13 +46,13 @@ INSERT INTO item (descricao, localizacao, latitude, longitude) VALUES ('Descrica
 
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((1,1),(5,5))','url-imagem1','Portugues','2019-1-23 01:11:00','Descricao da anomalia 1', true);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((2,2),(5,5))','url-imagem2','Ingles','2019-2-22 02:52:11','Descricao da anomalia 2', false);
-INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((3,3),(8,5))','url-imagem3','Espanhol','2017-3-21 03:34:24','Descricao da anomalia 3', true);
+INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((3,3),(8,5))','url-imagem3','Espanhol','2019-11-21 03:34:24','Descricao da anomalia 3', true);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((4,5),(9,9))','url-imagem4','Frances','2018-4-20 04:15:35','Descricao da anomalia 4', false);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((5,4),(10,10))','url-imagem5','Italiano','2019-5-19 05:50:36','Descricao da anomalia 5', true);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((6,7),(11,9))','url-imagem6','Portugues','2019-6-18 06:50:47','Descricao da anomalia 6', false);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((7,6),(10,15))','url-imagem7','Italiano','2019-7-17 07:50:27','Descricao da anomalia 7', true);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((8,8),(15,15))','url-imagem8','Ingles','2019-8-16 08:32:36','Descricao da anomalia 8', false);
-INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((9,9),(15,15))','url-imagem9','Portugues','2018-9-15 09:12:37','Descricao da anomalia 9', true);
+INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((9,9),(15,15))','url-imagem9','Portugues','2019-11-15 09:12:37','Descricao da anomalia 9', true);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((10,11),(12,13))','url-imagem10','Espanhol','2017-10-14 10:00:23','Descricao da anomalia 10', false);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((11,10),(13,16))','url-imagem11','Portugues','2019-11-13 11:06:29','Descricao da anomalia 11', true);
 INSERT INTO anomalia (zona, imagem, lingua, ts, descricao, tem_anomalia_redacao) VALUES ('((12,12),(17,20))','url-imagem12','Espanhol','2018-12-12 12:28:52','Descricao da anomalia 12', false);

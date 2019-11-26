@@ -24,7 +24,7 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $utilizador = "SELECT email FROM utilizador";
+        $utilizador = "SELECT email FROM utilizador ORDER BY email ASC";
 
         $result = $db->prepare($utilizador);
         $result->execute();
