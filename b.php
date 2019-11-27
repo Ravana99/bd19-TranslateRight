@@ -150,31 +150,33 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        switch ($_GET['action']) {
-            case "add":
-                addEntry($db, $_GET['email'], $_GET['anomalia_id'], $_GET['texto']);
-                break;
+        $action = $_GET['action'];
+        if ($action)
+            switch ($action) {
+                case "add":
+                    addEntry($db, $_GET['email'], $_GET['anomalia_id'], $_GET['texto']);
+                    break;
 
-            case "edit":
-                editEntry(
-                    $db,
-                    $_GET['email'],
-                    $_GET['nro'],
-                    $_GET['anomalia_id'],
-                    $_GET['texto'],
-                    $_GET['email_old'],
-                    $_GET['anomalia_id_old'],
-                    $_GET['texto_old']
-                );
-                break;
-            case "delete":
-                deleteEntry($db, $_GET['email'], $_GET['nro']);
-                break;
+                case "edit":
+                    editEntry(
+                        $db,
+                        $_GET['email'],
+                        $_GET['nro'],
+                        $_GET['anomalia_id'],
+                        $_GET['texto'],
+                        $_GET['email_old'],
+                        $_GET['anomalia_id_old'],
+                        $_GET['texto_old']
+                    );
+                    break;
+                case "delete":
+                    deleteEntry($db, $_GET['email'], $_GET['nro']);
+                    break;
 
-            case "showForm":
-                ShowForm($_GET['add']);
-                break;
-        }
+                case "showForm":
+                    ShowForm($_GET['add']);
+                    break;
+            }
 
 
         $correcao = "SELECT email,nro,anomalia_id FROM correcao";

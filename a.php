@@ -124,46 +124,48 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        switch ($_GET['action']) {
-            case "addLocalPublico":
-                addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
-                break;
-            case "deleteLocalPublico":
-                deleteEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude']);
-                break;
+        $action = $_GET['action'];
+        if ($action)
+            switch ($action) {
+                case "addLocalPublico":
+                    addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
+                    break;
+                case "deleteLocalPublico":
+                    deleteEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude']);
+                    break;
 
-            case "addItem":
-                addEntry_Item(
-                    $db,
-                    $_GET['descricao'],
-                    $_GET['localizacao'],
-                    $_GET['latitude'],
-                    $_GET['longitude']
-                );
-                break;
-            case "deleteItem":
-                deleteEntry_Item($db, $_GET['id']);
-                break;
+                case "addItem":
+                    addEntry_Item(
+                        $db,
+                        $_GET['descricao'],
+                        $_GET['localizacao'],
+                        $_GET['latitude'],
+                        $_GET['longitude']
+                    );
+                    break;
+                case "deleteItem":
+                    deleteEntry_Item($db, $_GET['id']);
+                    break;
 
-            case "addAnomalia":
-                addEntry_Anomalia(
-                    $db,
-                    $_GET['zona'],
-                    $_GET['imagem'],
-                    $_GET['lingua'],
-                    $_GET['ts'],
-                    $_GET['descricao'],
-                    $_GET['tem_anomalia_redacao']
-                );
-                break;
-            case "deleteAnomalia":
-                deleteEntry_Anomalia($db, $_GET['id']);
-                break;
+                case "addAnomalia":
+                    addEntry_Anomalia(
+                        $db,
+                        $_GET['zona'],
+                        $_GET['imagem'],
+                        $_GET['lingua'],
+                        $_GET['ts'],
+                        $_GET['descricao'],
+                        $_GET['tem_anomalia_redacao']
+                    );
+                    break;
+                case "deleteAnomalia":
+                    deleteEntry_Anomalia($db, $_GET['id']);
+                    break;
 
-            case "showForm":
-                ShowForm($db, $_GET['tableName']);
-                break;
-        }
+                case "showForm":
+                    ShowForm($db, $_GET['tableName']);
+                    break;
+            }
 
 
         $local_publico = "SELECT latitude,longitude,nome FROM local_publico";

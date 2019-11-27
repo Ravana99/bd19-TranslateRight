@@ -99,14 +99,16 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        switch ($_GET['action']) {
-            case "showAnomalias":
-                showAnomalias($db, $_GET['latitude'], $_GET['longitude'], $_GET['dx'], $_GET['dy']);
-                break;
-            default:
-                showForm();
-                break;
-        }
+        $action = $_GET['action'];
+        if ($action)
+            switch ($action) {
+                case "showAnomalias":
+                    showAnomalias($db, $_GET['latitude'], $_GET['longitude'], $_GET['dx'], $_GET['dy']);
+                    break;
+                default:
+                    showForm();
+                    break;
+            }
     } catch (PDOException $e) {
         echo ("<p>ERROR: {$e->getMessage()}</p>");
     }

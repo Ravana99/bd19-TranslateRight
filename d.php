@@ -83,18 +83,20 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        switch ($_GET['action']) {
-            case "registerIncidencia":
-                registerIncidencia($db, $_GET['anomalia_id'], $_GET['item_id'], $_GET['email']);
-                break;
-            case "registerDuplicado":
-                registerDuplicado($db, $_GET['item1'], $_GET['item2']);
-                break;
+        $action = $_GET['action'];
+        if ($action)
+            switch ($action) {
+                case "registerIncidencia":
+                    registerIncidencia($db, $_GET['anomalia_id'], $_GET['item_id'], $_GET['email']);
+                    break;
+                case "registerDuplicado":
+                    registerDuplicado($db, $_GET['item1'], $_GET['item2']);
+                    break;
 
-            case "showForm":
-                ShowForm($_GET['tableName'], $_GET['add']);
-                break;
-        }
+                case "showForm":
+                    ShowForm($_GET['tableName'], $_GET['add']);
+                    break;
+            }
 
         $incidencia = "SELECT anomalia_id,item_id,email FROM incidencia";
         $duplicado = "SELECT item1,item2 FROM duplicado ORDER BY item1 ASC, item2 ASC";
