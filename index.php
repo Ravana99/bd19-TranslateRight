@@ -24,6 +24,9 @@
     <br />
     <a href="f.php">Listar todas as anomalias registadas nos ultimos
         três meses a mais ou menos (dX,dY) graus de (latitude,longitude)</a>
+    <br />
+    <br />
+
 </body>
 
 </html>
