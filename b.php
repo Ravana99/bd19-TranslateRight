@@ -150,8 +150,8 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $action = $_GET['action'];
-        if ($action)
+        if (isset($_GET['action'])) {
+            $action = $_GET['action'];
             switch ($action) {
                 case "add":
                     addEntry($db, $_GET['email'], $_GET['anomalia_id'], $_GET['texto']);
@@ -177,6 +177,7 @@
                     ShowForm($_GET['add']);
                     break;
             }
+        }
 
 
         $correcao = "SELECT email,nro,anomalia_id FROM correcao";

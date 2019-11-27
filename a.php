@@ -124,8 +124,8 @@
         $db = new PDO("pgsql:host=$host;dbname=$dbname", $user, $password);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $action = $_GET['action'];
-        if ($action)
+        if (isset($_GET['action'])) {
+            $action = $_GET['action'];
             switch ($action) {
                 case "addLocalPublico":
                     addEntry_LocalPublico($db, $_GET['latitude'], $_GET['longitude'], $_GET['nome']);
@@ -166,6 +166,7 @@
                     ShowForm($db, $_GET['tableName']);
                     break;
             }
+        }
 
 
         $local_publico = "SELECT latitude,longitude,nome FROM local_publico";
