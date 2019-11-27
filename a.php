@@ -251,7 +251,7 @@
             echo ("<tr>");
             echo ("<td>{$row['id']}</td>\n");
             echo ("<td>{$row['zona']}</td>\n");
-            echo ("<td>{$row['imagem']}</td>\n");
+            echo ("<td><img src=\"{$row['imagem']}\"/></td>\n");
             echo ("<td>{$row['lingua']}</td>\n");
             echo ("<td>{$row['ts']}</td>\n");
             echo ("<td>{$row['descricao']}</td>\n");

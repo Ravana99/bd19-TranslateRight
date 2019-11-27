@@ -34,7 +34,7 @@
             $item2 = $temp;
         }
         */
-        
+
         $sql = "INSERT INTO duplicado (item1,item2) VALUES (:item1,:item2)";
         $result = $db->prepare($sql);
         $result->execute([':item1' => $item1, ':item2' => $item2]);
