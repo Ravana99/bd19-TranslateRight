@@ -21,16 +21,17 @@
     {
         echo ("<div style=\"
         width:400px;
-        height:400px;
-        background-color:red;
+        background-color:white;
+        border:1px black solid;
         position:absolute;
         left:50%;
         top:50%;
         transform:translate(-50%,-50%);
         display:flex; 
         flex-direction:column;
-        align-items:center; 
-        text-align:center;\">");
+        align-items:center;
+        text-align:left;
+        padding:0 20px;\">");
 
         echo "<form name=\"form\" method=\"get\">";
         echo "<h3>Escolha os dois locais</h3>";
@@ -104,7 +105,7 @@
             echo ("<tr>");
             echo ("<td>{$row['id']}</td>\n");
             echo ("<td>{$row['zona']}</td>\n");
-            echo ("<td>{$row['imagem']}</td>\n");
+            echo ("<td><img src=\"{$row['imagem']}\" width=\"220px\" height=\"200px\"/></td>\n");
             echo ("<td>{$row['lingua']}</td>\n");
             echo ("<td>{$row['ts']}</td>\n");
             echo ("<td>{$row['descricao']}</td>\n");

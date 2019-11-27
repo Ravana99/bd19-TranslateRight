@@ -21,16 +21,17 @@
     {
         echo ("<div style=\"
         width:400px;
-        height:400px;
-        background-color:red;
+        background-color:white;
+        border:1px black solid;
         position:absolute;
         left:50%;
         top:50%;
         transform:translate(-50%,-50%);
         display:flex; 
         flex-direction:column;
-        align-items:center; 
-        text-align:center;\">");
+        align-items:center;
+        text-align:left;
+        padding:0 20px;\">");
 
         echo "<form name=\"form\" method=\"get\">";
         echo "<h3>Insira os valores</h3>";
@@ -38,8 +39,8 @@
 
         echo "<p>dX: <input type=\"text\" name=\"dx\"/></p>";
         echo "<p>dY: <input type=\"text\" name=\"dy\"/></p>";
-        echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
         echo "<p>Latitude: <input type=\"text\" name=\"latitude\"/></p>";
+        echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
 
         echo "<input type=\"submit\" value=\"Listar anomalias\"/>";
         echo "</form>";
@@ -77,7 +78,7 @@
             echo ("<tr>");
             echo ("<td>{$row['id']}</td>\n");
             echo ("<td>{$row['zona']}</td>\n");
-            echo ("<td>{$row['imagem']}</td>\n");
+            echo ("<td><img src=\"{$row['imagem']}\" width=\"220px\" height=\"200px\"/></td>\n");
             echo ("<td>{$row['lingua']}</td>\n");
             echo ("<td>{$row['ts']}</td>\n");
             echo ("<td>{$row['descricao']}</td>\n");

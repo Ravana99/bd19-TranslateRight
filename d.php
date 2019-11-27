@@ -45,16 +45,17 @@
     {
         echo ("<div style=\"
         width:400px;
-        height:400px;
-        background-color:red;
+        background-color:white;
+        border:1px black solid;
         position:absolute;
         left:50%;
         top:50%;
         transform:translate(-50%,-50%);
         display:flex; 
         flex-direction:column;
-        align-items:center; 
-        text-align:center;\">");
+        align-items:center;
+        text-align:left;
+        padding:0 20px;\">");
 
         echo "<form name=\"form\" method=\"get\">";
         if ($tableName == 'incidencia') {
