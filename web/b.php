@@ -12,6 +12,10 @@
     
     function addCorrecao($db, $email, $nro, $anomalia_id)
     {
+        $emailnroArray = explode("/", $emailnro);
+        $email = $emailnroArray[0];
+        $nro = $emailnroArray[1];
+
         $sql = "INSERT INTO correcao (email,nro,anomalia_id) VALUES (:email,:nro,:anomalia_id)";
         $result = $db->prepare($sql);
         $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
@@ -156,11 +160,9 @@
 
         echo "<form name=\"form\" method=\"get\">";
         if ($tableName == 'propostaCorrecao') {
-            if ($add == true) {
+            if ($add == 1) {
                 echo "<h3>Adicionar uma Proposta de Correcao</h3>";
                 echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
-                echo "<p>Anomalia: <input type=\"text\" name=\"anomalia_id\"/></p>";
-                #echo "<input type=\"hidden\" name=\"anomalia_id\" value=\"$nro\"/></p>";
             } else {
                 $email_old = $_GET['email'];
                 $nro = $_GET['nro'];
@@ -170,7 +172,7 @@
                 echo "<input type=\"hidden\" name=\"nro\" value=\"$nro\"/></p>";
             }
 
-            $email = "SELECT email FROM utilizador_qualificado";
+            $email = "SELECT email FROM utilizador_qualificado ORDER BY email ASC";
             $result = $db->prepare($email);
             $result->execute();
             echo "<p>Email: ";
@@ -181,11 +183,35 @@
             echo "</select></p>";
 
             echo "<p>Texto: <input type=\"text\" name=\"texto\"/></p>";
+
+
+            if ($add == 1) {
+                $anomalia_id = "SELECT anomalia_id FROM incidencia ORDER BY anomalia_id ASC";
+                $result = $db->prepare($anomalia_id);
+                $result->execute();
+                echo "<p>ID da anomalia da correçao correspondente: ";
+                echo "<select name=\"anomalia_id\">";
+                foreach ($result as $row) {
+                    echo "<option value={$row['anomalia_id']}>{$row['anomalia_id']}</option>";
+                }
+                echo "</select></p>";
+            }
             
         } else {
             echo "<h3>Adicionar uma Correcao</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addCorrecao\"/></p>";
-            $anomalia_id = "SELECT anomalia_id FROM incidencia";
+
+            $email = "SELECT email,nro FROM proposta_de_correcao ORDER BY email ASC, nro ASC";
+            $result = $db->prepare($email);
+            $result->execute();
+            echo "<p>Email/Nro: ";
+            echo "<select name=\"emailnro\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['email']}/{$row['nro']}>{$row['email']}/{$row['nro']}</option>";
+            }
+            echo "</select></p>";
+
+            $anomalia_id = "SELECT anomalia_id FROM incidencia ORDER BY anomalia_id ASC";
             $result = $db->prepare($anomalia_id);
             $result->execute();
             echo "<p>ID da anomalia: ";
@@ -195,17 +221,6 @@
             }
             echo "</select></p>";
 
-            $email = "SELECT DISTINCT email FROM proposta_de_correcao";
-            $result = $db->prepare($email);
-            $result->execute();
-            echo "<p>Email: ";
-            echo "<select name=\"email\">";
-            foreach ($result as $row) {
-                echo "<option value={$row['email']}>{$row['email']}</option>";
-            }
-            echo "</select></p>";
-
-            echo "<p>Nro: <input type=\"text\" name=\"nro\"/></p>";
         }
 
         echo "<input type=\"submit\" value=\"Submeter\"/>";
@@ -226,7 +241,7 @@
             $action = $_GET['action'];
             switch ($action) {
                 case "addCorrecao":
-                    addCorrecao($db, $_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
+                    addCorrecao($db, $_GET['emailnro'], $_GET['anomalia_id']);
                     break;
                 case "addPropostaCorrecao":
                     addPropostaCorrecao($db, $_GET['email'], $_GET['texto'], $_GET['anomalia_id']);
@@ -255,8 +270,8 @@
         }
 
 
-        $correcao = "SELECT email,nro,anomalia_id FROM correcao";
-        $propostaCorrecao = "SELECT email,nro,data_hora,texto FROM proposta_de_correcao";
+        $correcao = "SELECT email,nro,anomalia_id FROM correcao ORDER BY email ASC, nro ASC, anomalia_id ASC";
+        $propostaCorrecao = "SELECT email,nro,data_hora,texto FROM proposta_de_correcao ORDER BY email ASC, nro ASC";
 
         $result = $db->prepare($correcao);
         $result->execute();
