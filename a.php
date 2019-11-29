@@ -9,12 +9,6 @@
 
 <body>
     <?php
-    function console_log($data)
-    {
-        echo '<script>';
-        echo 'console.log(' . json_encode($data) . ')';
-        echo '</script>';
-    }
 
     function addEntry_LocalPublico($db, $latitude, $longitude, $nome)
     {
@@ -31,8 +25,11 @@
         header("Location:/a.php");
     }
 
-    function addEntry_Item($db, $descricao, $localizacao, $latitude, $longitude)
+    function addEntry_Item($db, $descricao, $localizacao, $coordenadas)
     {
+        $coordenadasArray = explode("/", $coordenadas);
+        $latitude = $coordenadasArray[0];
+        $longitude = $coordenadasArray[1];
         $sql = "INSERT INTO item (id,descricao,localizacao,latitude,longitude) 
         VALUES (default,:descricao,:localizacao,:latitude,:longitude)";
         $result = $db->prepare($sql);
@@ -47,10 +44,10 @@
         header("Location:/a.php");
     }
 
-    function addEntry_Anomalia($db, $zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao, $isAnomaliaTraducao)
+    function addEntry_Anomalia($db, $zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao)
     {
         $tem_anomalia_redacao == 'on' ? $tem_anomalia_redacao = 1 : $tem_anomalia_redacao = 0;
-        str_replace('"', "", $zona);
+
         try {
             $db->beginTransaction();
 
@@ -63,7 +60,7 @@
             ]);
 
 
-            if ($isAnomaliaTraducao) {
+            if (!$tem_anomalia_redacao) {
                 $sql = "INSERT INTO anomalia_traducao (id,zona2,lingua2) VALUES (default,:zona2,:lingua2)";
                 $result = $db->prepare($sql);
                 $result->execute([
@@ -114,23 +111,13 @@
             echo "<input type=\"hidden\" name=\"action\" value=\"addItem\"/></p>";
             echo "<p>Descrição: <input type=\"text\" name=\"descricao\"/></p>";
 
-            $latitude = "SELECT latitude FROM local_publico";
-            $result = $db->prepare($latitude);
+            $coordenadas = "SELECT latitude,longitude FROM local_publico";
+            $result = $db->prepare($coordenadas);
             $result->execute();
-            echo "<p>Latitude: ";
-            echo "<select name=\"latitude\">";
+            echo "<p>Latitude / Longitude: ";
+            echo "<select name=\"coordenadas\">";
             foreach ($result as $row) {
-                echo "<option value={$row['latitude']}>{$row['latitude']}</option>";
-            }
-            echo "</select></p>";
-
-            $longitude = "SELECT longitude FROM local_publico";
-            $result = $db->prepare($longitude);
-            $result->execute();
-            echo "<p>Longitude: ";
-            echo "<select name=\"longitude\">";
-            foreach ($result as $row) {
-                echo "<option value={$row['longitude']}>{$row['longitude']}</option>";
+                echo "<option value={$row['latitude']}/{$row['longitude']}>{$row['latitude']}/{$row['longitude']}</option>";
             }
             echo "</select></p>";
             echo "<p>Localização: <input type=\"text\" name=\"localizacao\"/></p>";
@@ -206,8 +193,7 @@
                         $db,
                         $_GET['descricao'],
                         $_GET['localizacao'],
-                        $_GET['latitude'],
-                        $_GET['longitude']
+                        $_GET['coordenadas']
                     );
                     break;
                 case "deleteItem":
@@ -215,19 +201,7 @@
                     break;
 
                 case "addAnomalia":
-                    if (isset($_GET['zona2']) && $_GET['zona2']) {
-                        addEntry_Anomalia(
-                            $db,
-                            $_GET['zona'],
-                            $_GET['imagem'],
-                            $_GET['lingua'],
-                            $_GET['ts'],
-                            $_GET['descricao'],
-                            $_GET['tem_anomalia_redacao'],
-                            true
-                        );
-                        break;
-                    } else if (!$_GET['tem_anomalia_redacao']) {
+                    if ($_GET['tem_anomalia_redacao'] != 'on' && !isset($_GET['zona2'])) {
                         showForm2(
                             $_GET['zona'],
                             $_GET['imagem'],
@@ -236,18 +210,17 @@
                             $_GET['descricao'],
                             $_GET['tem_anomalia_redacao']
                         );
+                    } else {
+                        addEntry_Anomalia(
+                            $db,
+                            $_GET['zona'],
+                            $_GET['imagem'],
+                            $_GET['lingua'],
+                            $_GET['ts'],
+                            $_GET['descricao'],
+                            $_GET['tem_anomalia_redacao']
+                        );
                     }
-                    console_log('here');
-                    addEntry_Anomalia(
-                        $db,
-                        $_GET['zona'],
-                        $_GET['imagem'],
-                        $_GET['lingua'],
-                        $_GET['ts'],
-                        $_GET['descricao'],
-                        $_GET['tem_anomalia_redacao'],
-                        false
-                    );
                     break;
                 case "deleteAnomalia":
                     deleteEntry_Anomalia($db, $_GET['id']);
