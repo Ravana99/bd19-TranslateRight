@@ -79,7 +79,7 @@
             echo "<h3>Registar um duplicado</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"registerDuplicado\"/></p>";
 
-            $item1 = "SELECT id FROM item";
+            $item1 = "SELECT id FROM item ORDER BY id ASC";
             $result = $db->prepare($item1);
             $result->execute();
             echo "<p>Item Original: ";
@@ -89,7 +89,7 @@
             }
             echo "</select></p>";
 
-            $item2 = "SELECT id FROM item";
+            $item2 = "SELECT id FROM item ORDER BY id ASC";
             $result = $db->prepare($item2);
             $result->execute();
             echo "<p>Item Duplicado: ";

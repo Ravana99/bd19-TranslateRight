@@ -210,10 +210,11 @@
                     break;
 
                 case "addAnomalia":
-                    if (isset($GET['tem_anomalia_redacao']))
-                        $tem_anomalia_redacao = $GET['tem_anomalia_redacao'];
+                    if (isset($_GET['tem_anomalia_redacao']))
+                        $tem_anomalia_redacao = $_GET['tem_anomalia_redacao'];
                     else
                         $tem_anomalia_redacao = 'off';
+                
                     if ($tem_anomalia_redacao != 'on' && !isset($_GET['zona2'])) {
                         showForm2(
                             $_GET['zona'],
