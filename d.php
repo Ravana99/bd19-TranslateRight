@@ -9,12 +9,6 @@
 
 <body>
     <?php
-    function console_log($data)
-    {
-        echo '<script>';
-        echo 'console.log(' . json_encode($data) . ')';
-        echo '</script>';
-    }
 
     function registerIncidencia($db, $anomalia_id, $item_id, $email)
     {
@@ -25,23 +19,13 @@
     }
     function registerDuplicado($db, $item1, $item2)
     {
-        /*
-        #to make sure that item1 is the one with the lowest id
-
-        if ($item1 > $item2) {
-            $temp = $item1;
-            $item1 = $item2;
-            $item2 = $temp;
-        }
-        */
-
         $sql = "INSERT INTO duplicado (item1,item2) VALUES (:item1,:item2)";
         $result = $db->prepare($sql);
         $result->execute([':item1' => $item1, ':item2' => $item2]);
         header("Location:/d.php");
     }
 
-    function ShowForm($tableName)
+    function ShowForm($db, $tableName)
     {
         echo ("<div style=\"
         width:400px;
@@ -61,14 +45,59 @@
         if ($tableName == 'incidencia') {
             echo "<h3>Registar uma Incidencia</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"registerIncidencia\"/></p>";
-            echo "<p>ID da Anomalia: <input type=\"text\" name=\"anomalia_id\"/></p>";
-            echo "<p>ID do Item: <input type=\"text\" name=\"item_id\"/></p>";
-            echo "<p>Email: <input type=\"text\" name=\"email\"/></p>";
+
+            $anomalia_id = "SELECT id FROM anomalia";
+            $result = $db->prepare($anomalia_id);
+            $result->execute();
+            echo "<p>ID da anomalia: ";
+            echo "<select name=\"anomalia_id\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['id']}>{$row['id']}</option>";
+            }
+            echo "</select></p>";
+
+            $item_id = "SELECT id FROM item";
+            $result = $db->prepare($item_id);
+            $result->execute();
+            echo "<p>ID do item: ";
+            echo "<select name=\"item_id\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['id']}>{$row['id']}</option>";
+            }
+            echo "</select></p>";
+
+            $email = "SELECT email FROM utilizador";
+            $result = $db->prepare($email);
+            $result->execute();
+            echo "<p>Email: ";
+            echo "<select name=\"email\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['email']}>{$row['email']}</option>";
+            }
+            echo "</select></p>";
         } else {
             echo "<h3>Registar um duplicado</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"registerDuplicado\"/></p>";
-            echo "<p>Item Original: <input type=\"text\" name=\"item1\"/></p>";
-            echo "<p>Item Duplicado: <input type=\"text\" name=\"item2\"/></p>";
+
+            $item1 = "SELECT id FROM item";
+            $result = $db->prepare($item1);
+            $result->execute();
+            echo "<p>Item Original: ";
+            echo "<select name=\"item1\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['id']}>{$row['id']}</option>";
+            }
+            echo "</select></p>";
+
+            $item2 = "SELECT id FROM item";
+            $result = $db->prepare($item2);
+            $result->execute();
+            echo "<p>Item Duplicado: ";
+            echo "<select name=\"item2\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['id']}>{$row['id']}</option>";
+            }
+            echo "</select></p>";
         }
         echo "<input type=\"submit\" value=\"Adicionar\"/>";
         echo "</form>";
@@ -95,7 +124,7 @@
                     break;
 
                 case "showForm":
-                    ShowForm($_GET['tableName'], $_GET['add']);
+                    ShowForm($db, $_GET['tableName'], $_GET['add']);
                     break;
             }
         }
