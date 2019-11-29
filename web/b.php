@@ -133,7 +133,7 @@
 
         echo "<form name=\"form\" method=\"get\">";
         if ($tableName == 'propostaCorrecao') {
-            if ($add) {
+            if ($add == true) {
                 echo "<h3>Adicionar uma Proposta de Correcao</h3>";
                 echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
             } else {
@@ -259,7 +259,7 @@
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"b.php?add=true&action=showForm&tableName=correcao\">
+        echo ("<a href=\"b.php?add=1&action=showForm&tableName=correcao\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
@@ -288,14 +288,14 @@
             echo ("<td>{$texto}</td>\n");
             echo ("<td><a href=\"b.php?action=deletePropostaCorrecao&email=$email&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
-            echo ("<td><a href=\"b.php?action=showForm&tableName=propostaCorrecao&
+            echo ("<td><a href=\"b.php?add=0&action=showForm&tableName=propostaCorrecao&
             email=$email&texto=$texto&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='edit.jpeg'/>
             </a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"b.php?add=true&action=showForm&tableName=propostaCorrecao\">
+        echo ("<a href=\"b.php?add=1&action=showForm&tableName=propostaCorrecao\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");

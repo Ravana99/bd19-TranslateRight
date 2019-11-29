@@ -124,7 +124,7 @@
                     break;
 
                 case "showForm":
-                    ShowForm($db, $_GET['tableName'], $_GET['add']);
+                    ShowForm($db, $_GET['tableName']);
                     break;
             }
         }
