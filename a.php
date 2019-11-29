@@ -47,20 +47,35 @@
         header("Location:/a.php");
     }
 
-    function addEntry_Anomalia($db, $zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao)
+    function addEntry_Anomalia($db, $zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao, $isAnomaliaTraducao)
     {
         $tem_anomalia_redacao == 'on' ? $tem_anomalia_redacao = 1 : $tem_anomalia_redacao = 0;
         str_replace('"', "", $zona);
+        try {
+            $db->beginTransaction();
 
-        $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
+            if ($isAnomaliaTraducao) {
+                $sql = "INSERT INTO anomalia_traducao (id,zona2,lingua2) VALUES (default,:zona2,:lingua2)";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':zona2' => $_GET['zona2'], ':lingua2' => $_GET['lingua2']
+                ]);
+            }
+
+            $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
         VALUES (default,:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
-        $result = $db->prepare($sql);
-        $result->execute([
-            ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
-            ':ts' => $ts, ':descricao' => $descricao, ':tem_anomalia_redacao' => $tem_anomalia_redacao
-        ]);
-        header("Location:/a.php");
+            $result = $db->prepare($sql);
+            $result->execute([
+                ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
+                ':ts' => $ts, ':descricao' => $descricao, ':tem_anomalia_redacao' => $tem_anomalia_redacao
+            ]);
+            header("Location:/a.php");
+        } catch (PDOException $e) {
+            $db->rollBack();
+            echo ("<p>ERROR: {$e->getMessage()}</p>");
+        }
     }
+
     function deleteEntry_Anomalia($db, $id)
     {
         $sql = "DELETE FROM anomalia WHERE id = :id;";
@@ -95,11 +110,28 @@
         } else if ($tableName == 'item') {
             echo "<h3>Adicionar um item</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addItem\"/></p>";
-
             echo "<p>Descrição: <input type=\"text\" name=\"descricao\"/></p>";
+
+            $latitude = "SELECT latitude FROM local_publico";
+            $result = $db->prepare($latitude);
+            $result->execute();
+            echo "<p>Latitude: ";
+            echo "<select name=\"latitude\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['latitude']}>{$row['latitude']}</option>";
+            }
+            echo "</select></p>";
+
+            $longitude = "SELECT longitude FROM local_publico";
+            $result = $db->prepare($longitude);
+            $result->execute();
+            echo "<p>Longitude: ";
+            echo "<select name=\"longitude\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['longitude']}>{$row['longitude']}</option>";
+            }
+            echo "</select></p>";
             echo "<p>Localização: <input type=\"text\" name=\"localizacao\"/></p>";
-            echo "<p>Latitude: <input type=\"text\" name=\"latitude\"/></p>";
-            echo "<p>Longitude: <input type=\"text\" name=\"longitude\"/></p>";
         } else {
             echo "<h3>Adicionar uma anomalia</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
@@ -116,6 +148,38 @@
         echo ("</div>");
     }
 
+    function ShowForm2($zona, $imagem, $lingua, $ts, $descricao, $tem_anomalia_redacao)
+    {
+        echo ("<div style=\"
+        width:400px;
+        background-color:white;
+        border:1px black solid;
+        position:absolute;
+        left:50%;
+        top:50%;
+        transform:translate(-50%,-50%);
+        display:flex; 
+        flex-direction:column;
+        align-items:center;
+        text-align:left;
+        padding:0 20px;\">");
+
+        echo "<form name=\"form\" method=\"get\">";
+        echo "<h3>Dados da anomalia de traducao</h3>";
+        echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
+        echo "<p>Zona: <input type=\"hidden\" name=\"zona\" value=$zona/></p>";
+        echo "<p>Imagem: <input type=\"hidden\" name=\"imagem\" value=$imagem/></p>";
+        echo "<p>Lingua: <input type=\"hidden\" name=\"lingua\" value=$lingua/></p>";
+        echo "<p>Time stamp: <input type=\"hidden\" name=\"ts\" value=$ts/></p>";
+        echo "<p>Descrição: <input type=\"hidden\" name=\"descricao\" value=$descricao/></p>";
+        echo "<p>Anomalia de Redação: <input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao/></p>";
+
+        echo "<p>Zona 2: <input type=\"text\" name=\"zona2\"/></p>";
+        echo "<p>Lingua 2: <input type=\"text\" name=\"lingua2\"/></p>";
+        echo "<input type=\"submit\" value=\"Adicionar\"/>";
+        echo "</form>";
+        echo ("</div>");
+    }
     try {
         $host = "db.ist.utl.pt";
         $user = "ist189476";
@@ -149,6 +213,30 @@
                     break;
 
                 case "addAnomalia":
+                    if (isset($_GET['zona2']) && $_GET['zona2']) {
+                        addEntry_Anomalia(
+                            $db,
+                            $_GET['zona'],
+                            $_GET['imagem'],
+                            $_GET['lingua'],
+                            $_GET['ts'],
+                            $_GET['descricao'],
+                            $_GET['tem_anomalia_redacao'],
+                            true
+                        );
+                        break;
+                    }
+
+                    if (!$_GET['tem_anomalia_redacao']) {
+                        showFormAnomaliaTraducao(
+                            $_GET['zona'],
+                            $_GET['imagem'],
+                            $_GET['lingua'],
+                            $_GET['ts'],
+                            $_GET['descricao'],
+                            $_GET['tem_anomalia_redacao']
+                        );
+                    }
                     addEntry_Anomalia(
                         $db,
                         $_GET['zona'],
@@ -156,7 +244,8 @@
                         $_GET['lingua'],
                         $_GET['ts'],
                         $_GET['descricao'],
-                        $_GET['tem_anomalia_redacao']
+                        $_GET['tem_anomalia_redacao'],
+                        false
                     );
                     break;
                 case "deleteAnomalia":
@@ -173,6 +262,8 @@
         $local_publico = "SELECT latitude,longitude,nome FROM local_publico";
         $item = "SELECT id,descricao,localizacao,latitude,longitude FROM item";
         $anomalia = "SELECT id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao FROM anomalia";
+        $anomalia_traducao = "SELECT id,zona2,lingua2 FROM anomalia_traducao";
+
 
         $result = $db->prepare($local_publico);
         $result->execute();
@@ -269,6 +360,29 @@
         echo ("<a href=\"a.php?action=showForm&tableName=anomalia\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
+
+
+        $result = $db->prepare($anomalia_traducao);
+        $result->execute();
+
+        echo ("<div style=\"display:flex; flex-direction:column; align-items:center\">");
+        echo ("<h3>Anomalia de traducao</h3>");
+        echo ("<table border=\"1\">\n");
+        echo ("<tr>");
+        echo ("<td>id</td>\n");
+        echo ("<td>zona2</td>\n");
+        echo ("<td>lingua2</td>\n");;
+        echo ("</tr>\n");
+        foreach ($result as $row) {
+            $id = $row['id'];
+            echo ("<tr>");
+            echo ("<td>{$row['id']}</td>\n");
+            echo ("<td>{$row['zona2']}</td>\n");
+            echo ("<td>{$row['lingua2']}</td>\n");
+            echo ("</tr>\n");
+        }
+        echo ("</table>\n");
+        echo ("</div>");
         echo ("</div>");
         $db = null;
     } catch (PDOException $e) {

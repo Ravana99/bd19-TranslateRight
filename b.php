@@ -49,7 +49,7 @@
 
         header("Location:b.php");
     }
-    function editEntry($db, $email, $nro, $anomalia_id, $texto, $email_old, $anomalia_id_old, $texto_old)
+    function editEntry($db, $email, $nro, $anomalia_id, $texto, $email_old)
     {
         try {
             $db->beginTransaction();
@@ -58,7 +58,7 @@
                 $sql = "UPDATE correcao SET email = :email WHERE email = :email_old AND nro=:nro AND anomalia_id=:anomalia_id_old;";
                 $result = $db->prepare($sql);
                 $result->execute([
-                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':anomalia_id_old' => $anomalia_id_old
+                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':anomalia_id_old' => $anomalia_id
                 ]);
 
                 $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old AND nro=:nro;";
@@ -68,14 +68,6 @@
                 ]);
             } else {
                 $email = $email_old;
-            }
-
-            if ($anomalia_id) {
-                $sql = "UPDATE correcao SET anomalia_id = :anomalia_id WHERE email = :email AND nro=:nro AND anomalia_id=:anomalia_id_old;";
-                $result = $db->prepare($sql);
-                $result->execute([
-                    ':anomalia_id' => $anomalia_id, ':email' => $email, ':nro' => $nro, ':anomalia_id_old' => $anomalia_id_old
-                ]);
             }
             if ($texto) {
                 $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email AND nro=:nro;";
@@ -93,7 +85,14 @@
         header("Location:b.php");
     }
 
-    function deleteEntry($db, $email, $nro)
+    function deleteEntryCorrecao($db, $email, $nro, $anomalia_id)
+    {
+        $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id=:anomalia_id;";
+        $result = $db->prepare($sql);
+        $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+        header("Location:b.php");
+    }
+    function deleteEntryPropostaCorrecao($db, $email, $nro)
     {
         $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro;";
         $result = $db->prepare($sql);
@@ -101,7 +100,7 @@
         header("Location:b.php");
     }
 
-    function ShowForm($add) #add is a flag, 1 if adding, 0 if editing
+    function ShowForm($db, $add, $tableName) #add is a flag, 1 if adding, 0 if editing
     {
         echo ("<div style=\"
         width:400px;
@@ -118,24 +117,53 @@
         padding:0 20px;\">");
 
         echo "<form name=\"form\" method=\"get\">";
-        if ($add) {
-            echo "<h3>Adicionar uma Correcao/Proposta de Correcao</h3>";
-            echo "<input type=\"hidden\" name=\"action\" value=\"add\"/></p>";
+        if ($tableName == 'propostaCorrecao') {
+            if ($add) {
+                echo "<h3>Adicionar uma Proposta de Correcao</h3>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"add\"/></p>";
+            } else {
+                $email_old = $_GET['email'];
+                $nro = $_GET['nro'];
+                echo "<h3>Editar Proposta de Correcao</h3>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"edit\"/></p>";
+                echo "<input type=\"hidden\" name=\"email_old\" value=\"$email_old\"/></p>";
+                echo "<input type=\"hidden\" name=\"nro\" value=\"$nro\"/></p>";
+            }
+
+            $email = "SELECT email FROM utilizador_qualificado";
+            $result = $db->prepare($email);
+            $result->execute();
+            echo "<p>Email: ";
+            echo "<select name=\"email\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['email']}>{$row['email']}</option>";
+            }
+            echo "</select></p>";
+
+            echo "<p>Texto: <input type=\"text\" name=\"texto\"/></p>";
         } else {
-            $email_old = $_GET['email'];
-            $anomalia_id_old = $_GET['anomalia_id'];
-            $texto_old = $_GET['texto'];
-            $nro = $_GET['nro'];
-            echo "<h3>Editar Correcao/Proposta de Correcao</h3>";
-            echo "<input type=\"hidden\" name=\"action\" value=\"edit\"/></p>";
-            echo "<input type=\"hidden\" name=\"email_old\" value=\"$email_old\"/></p>";
-            echo "<input type=\"hidden\" name=\"anomalia_id_old\" value=\"$anomalia_id_old\"/></p>";
-            echo "<input type=\"hidden\" name=\"texto_old\" value=\"$texto_old\"/></p>";
-            echo "<input type=\"hidden\" name=\"nro\" value=\"$nro\"/></p>";
+            echo "<h3>Adicionar uma Correcao</h3>";
+
+            $anomalia_id = "SELECT anomalia_id FROM incidencia";
+            $result = $db->prepare($anomalia_id);
+            $result->execute();
+            echo "<p>ID da anomalia: ";
+            echo "<select name=\"anomalia_id\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['anomalia_id']}>{$row['anomalia_id']}</option>";
+            }
+            echo "</select></p>";
+
+            $email = "SELECT email FROM proposta_de_correcao";
+            $result = $db->prepare($email);
+            $result->execute();
+            echo "<p>Email: ";
+            echo "<select name=\"email\">";
+            foreach ($result as $row) {
+                echo "<option value={$row['email']}>{$row['email']}</option>";
+            }
+            echo "</select></p>";
         }
-        echo "<p>Email: <input type=\"text\" name=\"email\"/></p>";
-        echo "<p>ID da anomalia: <input type=\"text\" name=\"anomalia_id\"/></p>";
-        echo "<p>Texto: <input type=\"text\" name=\"texto\"/></p>";
 
         echo "<input type=\"submit\" value=\"Submeter\"/>";
         echo "</form>";
@@ -165,17 +193,18 @@
                         $_GET['nro'],
                         $_GET['anomalia_id'],
                         $_GET['texto'],
-                        $_GET['email_old'],
-                        $_GET['anomalia_id_old'],
-                        $_GET['texto_old']
+                        $_GET['email_old']
                     );
                     break;
-                case "delete":
-                    deleteEntry($db, $_GET['email'], $_GET['nro']);
+                case "deleteCorrecao":
+                    deleteEntryCorrecao($db, $_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
+                    break;
+                case "deletePropostaCorrecao":
+                    deleteEntryPropostaCorrecao($db, $_GET['email'], $_GET['nro']);
                     break;
 
                 case "showForm":
-                    ShowForm($_GET['add']);
+                    ShowForm($db, $_GET['add'], $_GET['tableName']);
                     break;
             }
         }
@@ -204,15 +233,15 @@
             echo ("<td>{$email}</td>\n");
             echo ("<td>{$nro}</td>\n");
             echo ("<td>{$anomalia_id}</td>\n");
-            echo ("<td><a href=\"b.php?action=delete&email=$email&nro=$nro\">
+            echo ("<td><a href=\"b.php?action=deleteCorrecao&email=$email&nro=$nro&anomalia_id=$anomalia_id\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/>
-            </a></td>");
-            echo ("<td><a href=\"b.php?action=showForm&email=$email&nro=$nro&anomalia_id=$anomalia_id\">
-            <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='edit.jpeg'/>
             </a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
+        echo ("<a href=\"b.php?add=true&action=showForm&tableName=correcao\">
+        <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
+        </a>");
         echo ("</div>");
 
         $result = $db->prepare($propostaCorrecao);
@@ -237,16 +266,16 @@
             echo ("<td>{$nro}</td>\n");
             echo ("<td>{$data_hora}</td>\n");
             echo ("<td>{$texto}</td>\n");
-            echo ("<td><a href=\"b.php?action=delete&email=$email&nro=$nro\">
+            echo ("<td><a href=\"b.php?action=deletePropostaCorrecao&email=$email&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
-            echo ("<td><a href=\"b.php?action=showForm&
+            echo ("<td><a href=\"b.php?action=showForm&tableName=propostaCorrecao&
             email=$email&texto=$texto&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='edit.jpeg'/>
             </a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"b.php?add=true&action=showForm\">
+        echo ("<a href=\"b.php?add=true&action=showForm&tableName=propostaCorrecao\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");

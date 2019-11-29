@@ -45,6 +45,47 @@
         echo ("</table>\n");
         echo ("</div>");
 
+        $utilizador_qualificado = "SELECT email FROM utilizador_qualificado ORDER BY email ASC";
+
+        $result = $db->prepare($utilizador_qualificado);
+        $result->execute();
+
+        echo ("<div>");
+        echo ("<div style=\"display:flex; flex-direction:column;align-items:center; text-align:center;\">");
+        echo ("<h3>Utilizadores Qualificados</h3>");
+        echo ("<table border=\"1\">\n");
+        echo ("<tr>");
+        echo ("<td>email</td>\n");
+        echo ("</tr>\n");
+        foreach ($result as $row) {
+            $email = $row['email'];
+            echo ("<tr>");
+            echo ("<td>{$email}</td>\n");
+            echo ("</tr>\n");
+        }
+        echo ("</table>\n");
+        echo ("</div>");
+
+        $utilizador_regular = "SELECT email FROM utilizador_regular ORDER BY email ASC";
+
+        $result = $db->prepare($utilizador_regular);
+        $result->execute();
+
+        echo ("<div>");
+        echo ("<div style=\"display:flex; flex-direction:column;align-items:center; text-align:center;\">");
+        echo ("<h3>Utilizadores Regulares</h3>");
+        echo ("<table border=\"1\">\n");
+        echo ("<tr>");
+        echo ("<td>email</td>\n");
+        echo ("</tr>\n");
+        foreach ($result as $row) {
+            $email = $row['email'];
+            echo ("<tr>");
+            echo ("<td>{$email}</td>\n");
+            echo ("</tr>\n");
+        }
+        echo ("</table>\n");
+        echo ("</div>");
         $db = null;
     } catch (PDOException $e) {
         echo ("<p>ERROR: {$e->getMessage()}</p>");
