@@ -25,7 +25,7 @@
         header("Location:b.php");
     }
 
-    function addPropostaCorrecao($db, $email, $texto)
+    function addPropostaCorrecao($db, $email, $texto, $aid)
     {
         try {
             $db->beginTransaction();
@@ -43,6 +43,10 @@
         VALUES (:email,:nro,:data_hora,:texto)";
             $result = $db->prepare($sql);
             $result->execute([':email' => $email, ':nro' => $nro, ':data_hora' => date('Y-m-d H:i:s'), ':texto' => $texto]);
+
+            $sql = "INSERT INTO correcao VALUES (:email,:nro,:aid)";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro, ':aid' => $aid]);
 
             $db->commit();
         } catch (PDOException $e) {
@@ -102,9 +106,34 @@
 
     function deleteEntryCorrecao($db, $email, $nro, $anomalia_id)
     {
-        $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id=:anomalia_id;";
-        $result = $db->prepare($sql);
-        $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+        try {
+            $db->beginTransaction();
+
+
+            $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id=:anomalia_id;";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+
+            $sql = "SELECT email,nro FROM correcao WHERE email = :email AND nro = :nro";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro]);
+            $count = 0;
+            foreach ($result as $row) {
+                $count += 1;
+                break;
+            }
+            if (!$count) {
+                $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
+                $result = $db->prepare($sql);
+                $result->execute([':email' => $email, ':nro' => $nro]);
+            }
+
+            $db->commit();
+        } catch (PDOException $e) {
+            $db->rollBack();
+            echo ("<p>ERROR: {$e->getMessage()}</p>");
+        }
+
         header("Location:b.php");
     }
     function deleteEntryPropostaCorrecao($db, $email, $nro)
@@ -136,6 +165,8 @@
             if ($add == true) {
                 echo "<h3>Adicionar uma Proposta de Correcao</h3>";
                 echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
+                echo "<p>Anomalia: <input type=\"text\" name=\"anomalia_id\"/></p>";
+                #echo "<input type=\"hidden\" name=\"anomalia_id\" value=\"$nro\"/></p>";
             } else {
                 $email_old = $_GET['email'];
                 $nro = $_GET['nro'];
@@ -204,7 +235,7 @@
                     addCorrecao($db, $_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
                     break;
                 case "addPropostaCorrecao":
-                    addPropostaCorrecao($db, $_GET['email'], $_GET['texto']);
+                    addPropostaCorrecao($db, $_GET['email'], $_GET['texto'], $_GET['anomalia_id']);
                     break;
 
                 case "edit":
