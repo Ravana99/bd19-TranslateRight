@@ -51,8 +51,8 @@
         try {
             $db->beginTransaction();
 
-            $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
-        VALUES (default,:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
+            $sql = "INSERT INTO anomalia (zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
+        VALUES (:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
             $result = $db->prepare($sql);
             $result->execute([
                 ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
@@ -61,12 +61,21 @@
 
 
             if (!$tem_anomalia_redacao) {
-                $sql = "INSERT INTO anomalia_traducao (id,zona2,lingua2) VALUES (default,:zona2,:lingua2)";
+                $id = "SELECT id FROM anomalia WHERE id>=ALL(SELECT id FROM anomalia)";
+                $result = $db->prepare($id);
+                $result->execute();
+                foreach ($result as $row) {
+                    $id = $row['id'];
+                }
+
+                $sql = "INSERT INTO anomalia_traducao VALUES (:id,:zona2,:lingua2)";
                 $result = $db->prepare($sql);
                 $result->execute([
-                    ':zona2' => $_GET['zona2'], ':lingua2' => $_GET['lingua2']
+                    ':id' => $id, ':zona2' => $_GET['zona2'], ':lingua2' => $_GET['lingua2']
                 ]);
             }
+
+            $db->commit();
 
             header("Location:/a.php");
         } catch (PDOException $e) {
@@ -156,12 +165,12 @@
         echo "<form name=\"form\" method=\"get\">";
         echo "<h3>Dados da anomalia de traducao</h3>";
         echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
-        echo "<p><input type=\"hidden\" name=\"zona\" value=$zona/></p>";
-        echo "<p><input type=\"hidden\" name=\"imagem\" value=$imagem/></p>";
-        echo "<p><input type=\"hidden\" name=\"lingua\" value=$lingua/></p>";
-        echo "<p><input type=\"hidden\" name=\"ts\" value=$ts/></p>";
-        echo "<p><input type=\"hidden\" name=\"descricao\" value=$descricao/></p>";
-        echo "<p><input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao/></p>";
+        echo "<p><input type=\"hidden\" name=\"zona\" value=$zona></p>";
+        echo "<p><input type=\"hidden\" name=\"imagem\" value=$imagem></p>";
+        echo "<p><input type=\"hidden\" name=\"lingua\" value=$lingua></p>";
+        echo "<p><input type=\"hidden\" name=\"ts\" value=$ts></p>";
+        echo "<p><input type=\"hidden\" name=\"descricao\" value=$descricao></p>";
+        echo "<p><input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao></p>";
 
         echo "<p>Zona 2: <input type=\"text\" name=\"zona2\"/></p>";
         echo "<p>Lingua 2: <input type=\"text\" name=\"lingua2\"/></p>";
@@ -201,14 +210,18 @@
                     break;
 
                 case "addAnomalia":
-                    if ($_GET['tem_anomalia_redacao'] != 'on' && !isset($_GET['zona2'])) {
+                    if (isset($GET['tem_anomalia_redacao']))
+                        $tem_anomalia_redacao = $GET['tem_anomalia_redacao'];
+                    else
+                        $tem_anomalia_redacao = 'off';
+                    if ($tem_anomalia_redacao != 'on' && !isset($_GET['zona2'])) {
                         showForm2(
                             $_GET['zona'],
                             $_GET['imagem'],
                             $_GET['lingua'],
                             $_GET['ts'],
                             $_GET['descricao'],
-                            $_GET['tem_anomalia_redacao']
+                            $tem_anomalia_redacao
                         );
                     } else {
                         addEntry_Anomalia(
@@ -218,7 +231,7 @@
                             $_GET['lingua'],
                             $_GET['ts'],
                             $_GET['descricao'],
-                            $_GET['tem_anomalia_redacao']
+                            $tem_anomalia_redacao
                         );
                     }
                     break;

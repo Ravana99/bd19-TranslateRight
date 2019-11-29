@@ -19,7 +19,7 @@
         header("Location:b.php");
     }
 
-    function addPropostaCorrecao($db, $email, $texto)
+    function addPropostaCorrecao($db, $email, $texto, $aid)
     {
         try {
             $db->beginTransaction();
@@ -38,6 +38,10 @@
             $result = $db->prepare($sql);
             $result->execute([':email' => $email, ':nro' => $nro, ':data_hora' => date('Y-m-d H:i:s'), ':texto' => $texto]);
 
+            $sql = "INSERT INTO correcao VALUES (:email,:nro,:aid)";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro, ':aid' => $aid]);
+
             $db->commit();
         } catch (PDOException $e) {
             $db->rollBack();
@@ -53,55 +57,35 @@
         try {
             $db->beginTransaction();
 
-            if ($email != $email_old) {
-
-                $sql = "SELECT email FROM proposta_de_correcao WHERE email=:email and nro=:nro";
-                $result = $db->prepare($sql);
-                $result->execute([':email' => $email, ':nro' => $nro]);
-                foreach ($result as $row) {
-                    $email_nro_already_exist = $row['email'];
-                }
-                if ($email_nro_already_exist) {
-                    $sql = "SELECT nro AS total FROM proposta_de_correcao WHERE email=:email AND
-                nro>=ALL(SELECT nro FROM proposta_de_correcao WHERE email=:email);";
-                    $result = $db->prepare($sql);
-                    $result->execute([':email' => $email_old]);
-                    foreach ($result as $row) {
-                        $nro_new = $row['total'];
-                    }
-                    $nro_new += 1;
-
-                    $sql = "UPDATE proposta_de_correcao SET email = :email, nro=:nro_new WHERE email = :email_old AND nro=:nro;";
-                    $result = $db->prepare($sql);
-                    $result->execute([
-                        ':email' => $email, ':nro' => $nro, ':nro_new' => $nro_new, ':email_old' => $email_old
-                    ]);
-
-                    $sql = "UPDATE correcao SET email = :email, nro=:nro_new WHERE email = :email_old AND nro=:nro";
-                    $result = $db->prepare($sql);
-                    $result->execute([
-                        ':email' => $email, ':nro' => $nro, ':nro_new' => $nro_new, ':email_old' => $email_old
-                    ]);
-                    $nro = $nro_new;
-                }
-
-                $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old AND nro=:nro;";
-                $result = $db->prepare($sql);
-                $result->execute([
-                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
-                ]);
-
-                $sql = "UPDATE correcao SET email = :email WHERE email = :email_old AND nro=:nro";
-                $result = $db->prepare($sql);
-                $result->execute([
-                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
-                ]);
-            }
             if ($texto) {
                 $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email AND nro=:nro;";
                 $result = $db->prepare($sql);
                 $result->execute([
-                    ':texto' => $texto, ':email' => $email, ':nro' => $nro
+                    ':texto' => $texto, ':email' => $email_old, ':nro' => $nro
+                ]);
+            }
+
+            if ($email != $email_old) {
+
+                $sql = "SELECT nro AS total FROM proposta_de_correcao WHERE email=:email AND
+                nro>=ALL(SELECT nro FROM proposta_de_correcao WHERE email=:email);";
+                $result = $db->prepare($sql);
+                $result->execute([':email' => $email]);
+                foreach ($result as $row) {
+                    $nro_new = $row['total'];
+                }
+                $nro_new += 1;
+
+                $sql = "UPDATE proposta_de_correcao SET email = :email, nro=:nro_new WHERE email = :email_old AND nro=:nro;";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':nro_new' => $nro_new
+                ]);
+
+                $sql = "UPDATE correcao SET email = :email, nro=:nro_new WHERE email = :email_old AND nro=:nro";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':nro_new' => $nro_new
                 ]);
             }
 
@@ -110,14 +94,40 @@
             $db->rollBack();
             echo ("<p>ERROR: {$e->getMessage()}</p>");
         }
+        
         header("Location:b.php");
     }
 
     function deleteEntryCorrecao($db, $email, $nro, $anomalia_id)
     {
-        $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id=:anomalia_id;";
-        $result = $db->prepare($sql);
-        $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+        try {
+            $db->beginTransaction();
+
+
+            $sql = "DELETE FROM correcao WHERE email = :email AND nro = :nro AND anomalia_id=:anomalia_id;";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
+
+            $sql = "SELECT email,nro FROM correcao WHERE email = :email AND nro = :nro";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email, ':nro' => $nro]);
+            $count = 0;
+            foreach ($result as $row) {
+                $count += 1;
+                break;
+            }
+            if (!$count) {
+                $sql = "DELETE FROM proposta_de_correcao WHERE email = :email AND nro = :nro";
+                $result = $db->prepare($sql);
+                $result->execute([':email' => $email, ':nro' => $nro]);
+            }
+
+            $db->commit();
+        } catch (PDOException $e) {
+            $db->rollBack();
+            echo ("<p>ERROR: {$e->getMessage()}</p>");
+        }
+
         header("Location:b.php");
     }
     function deleteEntryPropostaCorrecao($db, $email, $nro)
@@ -146,9 +156,11 @@
 
         echo "<form name=\"form\" method=\"get\">";
         if ($tableName == 'propostaCorrecao') {
-            if ($add) {
+            if ($add == true) {
                 echo "<h3>Adicionar uma Proposta de Correcao</h3>";
                 echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
+                echo "<p>Anomalia: <input type=\"text\" name=\"anomalia_id\"/></p>";
+                #echo "<input type=\"hidden\" name=\"anomalia_id\" value=\"$nro\"/></p>";
             } else {
                 $email_old = $_GET['email'];
                 $nro = $_GET['nro'];
@@ -169,6 +181,7 @@
             echo "</select></p>";
 
             echo "<p>Texto: <input type=\"text\" name=\"texto\"/></p>";
+            
         } else {
             echo "<h3>Adicionar uma Correcao</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"addCorrecao\"/></p>";
@@ -182,7 +195,7 @@
             }
             echo "</select></p>";
 
-            $email = "SELECT email FROM proposta_de_correcao";
+            $email = "SELECT DISTINCT email FROM proposta_de_correcao";
             $result = $db->prepare($email);
             $result->execute();
             echo "<p>Email: ";
@@ -191,6 +204,8 @@
                 echo "<option value={$row['email']}>{$row['email']}</option>";
             }
             echo "</select></p>";
+
+            echo "<p>Nro: <input type=\"text\" name=\"nro\"/></p>";
         }
 
         echo "<input type=\"submit\" value=\"Submeter\"/>";
@@ -214,7 +229,7 @@
                     addCorrecao($db, $_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
                     break;
                 case "addPropostaCorrecao":
-                    addPropostaCorrecao($db, $_GET['email'], $_GET['texto']);
+                    addPropostaCorrecao($db, $_GET['email'], $_GET['texto'], $_GET['anomalia_id']);
                     break;
 
                 case "edit":
@@ -269,7 +284,7 @@
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"b.php?add=true&action=showForm&tableName=correcao\">
+        echo ("<a href=\"b.php?add=1&action=showForm&tableName=correcao\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
@@ -298,14 +313,14 @@
             echo ("<td>{$texto}</td>\n");
             echo ("<td><a href=\"b.php?action=deletePropostaCorrecao&email=$email&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='close.png'/></a></td>");
-            echo ("<td><a href=\"b.php?action=showForm&tableName=propostaCorrecao&
+            echo ("<td><a href=\"b.php?add=0&action=showForm&tableName=propostaCorrecao&
             email=$email&texto=$texto&nro=$nro\">
             <img style=\"float:right;\" width=\"30px\" height=\"30px\" src='edit.jpeg'/>
             </a></td>");
             echo ("</tr>\n");
         }
         echo ("</table>\n");
-        echo ("<a href=\"b.php?add=true&action=showForm&tableName=propostaCorrecao\">
+        echo ("<a href=\"b.php?add=1&action=showForm&tableName=propostaCorrecao\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
         echo ("</div>");
