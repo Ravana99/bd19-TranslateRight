@@ -51,8 +51,8 @@
         try {
             $db->beginTransaction();
 
-            $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
-        VALUES (default,:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
+            $sql = "INSERT INTO anomalia (zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
+        VALUES (:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
             $result = $db->prepare($sql);
             $result->execute([
                 ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
@@ -61,12 +61,21 @@
 
 
             if (!$tem_anomalia_redacao) {
-                $sql = "INSERT INTO anomalia_traducao (id,zona2,lingua2) VALUES (default,:zona2,:lingua2)";
+                $id = "SELECT id FROM anomalia WHERE id>=ALL(SELECT id FROM anomalia)";
+                $result = $db->prepare($id);
+                $result->execute();
+                foreach ($result as $row) {
+                    $id = $row['total'];
+                }
+
+                $sql = "INSERT INTO anomalia_traducao VALUES (:id,:zona2,:lingua2)";
                 $result = $db->prepare($sql);
                 $result->execute([
-                    ':zona2' => $_GET['zona2'], ':lingua2' => $_GET['lingua2']
+                    ':id' => $id, ':zona2' => $_GET['zona2'], ':lingua2' => $_GET['lingua2']
                 ]);
             }
+
+            $db->commit();
 
             header("Location:/a.php");
         } catch (PDOException $e) {
