@@ -5,17 +5,11 @@
         <h1>Base de Dados 2019/2020 Parte III</h1>
     </a>
     <h3>Listar todas as anomalias registadas nos ultimos
-        três meses a mais ou menos (dX,dY) graus de (latitude,longitude)</h3>
+        tres meses a mais ou menos (dX,dY) graus de (latitude,longitude)</h3>
 </header>
 
 <body>
     <?php
-    function console_log($data)
-    {
-        echo '<script>';
-        echo 'console.log(' . json_encode($data) . ')';
-        echo '</script>';
-    }
 
     function ShowForm()
     {

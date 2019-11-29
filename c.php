@@ -9,12 +9,7 @@
 
 <body>
     <?php
-    function console_log($data)
-    {
-        echo '<script>';
-        echo 'console.log(' . json_encode($data) . ')';
-        echo '</script>';
-    }
+
     try {
         $host = "db.ist.utl.pt";
         $user = "ist189476";

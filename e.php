@@ -4,18 +4,12 @@
     <a href="index.php">
         <h1>Base de Dados 2019/2020 Parte III</h1>
     </a>
-    <h3>Listar todas as anomalias de incidências registadas
-        na área compreendida entre dois locais públicos</h3>
+    <h3>Listar todas as anomalias de incidencias registadas
+        na area compreendida entre dois locais publicos</h3>
 </header>
 
 <body>
     <?php
-    function console_log($data)
-    {
-        echo '<script>';
-        echo 'console.log(' . json_encode($data) . ')';
-        echo '</script>';
-    }
 
     function ShowForm($db)
     {
