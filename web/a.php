@@ -65,7 +65,7 @@
                 $result = $db->prepare($id);
                 $result->execute();
                 foreach ($result as $row) {
-                    $id = $row['total'];
+                    $id = $row['id'];
                 }
 
                 $sql = "INSERT INTO anomalia_traducao VALUES (:id,:zona2,:lingua2)";
@@ -165,12 +165,12 @@
         echo "<form name=\"form\" method=\"get\">";
         echo "<h3>Dados da anomalia de traducao</h3>";
         echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
-        echo "<p><input type=\"hidden\" name=\"zona\" value=$zona/></p>";
-        echo "<p><input type=\"hidden\" name=\"imagem\" value=$imagem/></p>";
-        echo "<p><input type=\"hidden\" name=\"lingua\" value=$lingua/></p>";
-        echo "<p><input type=\"hidden\" name=\"ts\" value=$ts/></p>";
-        echo "<p><input type=\"hidden\" name=\"descricao\" value=$descricao/></p>";
-        echo "<p><input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao/></p>";
+        echo "<p><input type=\"hidden\" name=\"zona\" value=$zona></p>";
+        echo "<p><input type=\"hidden\" name=\"imagem\" value=$imagem></p>";
+        echo "<p><input type=\"hidden\" name=\"lingua\" value=$lingua></p>";
+        echo "<p><input type=\"hidden\" name=\"ts\" value=$ts></p>";
+        echo "<p><input type=\"hidden\" name=\"descricao\" value=$descricao></p>";
+        echo "<p><input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao></p>";
 
         echo "<p>Zona 2: <input type=\"text\" name=\"zona2\"/></p>";
         echo "<p>Lingua 2: <input type=\"text\" name=\"lingua2\"/></p>";
