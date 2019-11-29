@@ -47,7 +47,8 @@
         FROM incidencia,anomalia,item WHERE anomalia.id=anomalia_id AND item.id=item_id AND 
         latitude>=:minLatitude AND latitude<=:maxLatitude AND 
         longitude>=:minLongitude AND longitude<=:maxLongitude AND
-        ts>=CURRENT_DATE-interval '3 month' AND ts<=CURRENT_DATE";
+        ts>=CURRENT_DATE-interval '3 month' AND ts<=CURRENT_DATE
+        ORDER BY anomalia.id ASC";
 
         $result = $db->prepare($anomalias);
         $result->execute([

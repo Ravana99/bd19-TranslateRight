@@ -46,7 +46,7 @@
             echo "<h3>Registar uma Incidencia</h3>";
             echo "<input type=\"hidden\" name=\"action\" value=\"registerIncidencia\"/></p>";
 
-            $anomalia_id = "SELECT id FROM anomalia";
+            $anomalia_id = "SELECT id FROM anomalia ORDER BY id ASC";
             $result = $db->prepare($anomalia_id);
             $result->execute();
             echo "<p>ID da anomalia: ";
@@ -56,7 +56,7 @@
             }
             echo "</select></p>";
 
-            $item_id = "SELECT id FROM item";
+            $item_id = "SELECT id FROM item ORDER BY id ASC";
             $result = $db->prepare($item_id);
             $result->execute();
             echo "<p>ID do item: ";
@@ -66,7 +66,7 @@
             }
             echo "</select></p>";
 
-            $email = "SELECT email FROM utilizador";
+            $email = "SELECT email FROM utilizador ORDER BY email ASC";
             $result = $db->prepare($email);
             $result->execute();
             echo "<p>Email: ";
@@ -129,7 +129,7 @@
             }
         }
 
-        $incidencia = "SELECT anomalia_id,item_id,email FROM incidencia";
+        $incidencia = "SELECT anomalia_id,item_id,email FROM incidencia ORDER BY anomalia_id ASC";
         $duplicado = "SELECT item1,item2 FROM duplicado ORDER BY item1 ASC, item2 ASC";
 
         $result = $db->prepare($incidencia);

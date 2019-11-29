@@ -31,23 +31,23 @@
         echo "<h3>Escolha os dois locais</h3>";
         echo "<input type=\"hidden\" name=\"action\" value=\"showAnomalias\"/></p>";
 
-        $local1_nome = "SELECT nome FROM local_publico";
+        $local1_nome = "SELECT nome FROM local_publico ORDER BY nome ASC";
         $result = $db->prepare($local1_nome);
         $result->execute();
         echo "<p>Nome do Local Publico 1: ";
         echo "<select name=\"local1_nome\">";
         foreach ($result as $row) {
-            echo "<option value={$row['nome']}>{$row['nome']}</option>";
+            echo "<option value=\"{$row['nome']}\">{$row['nome']}</option>";
         }
         echo "</select></p>";
 
-        $local2_nome = "SELECT nome FROM local_publico";
+        $local2_nome = "SELECT nome FROM local_publico ORDER BY nome ASC";
         $result = $db->prepare($local2_nome);
         $result->execute();
         echo "<p>Nome do Local Publico 2: ";
         echo "<select name=\"local2_nome\">";
         foreach ($result as $row) {
-            echo "<option value={$row['nome']}>{$row['nome']}</option>";
+            echo "<option value=\"{$row['nome']}\">{$row['nome']}</option>";
         }
         echo "</select></p>";
 
@@ -79,17 +79,21 @@
             $latitude2 = $row['latitude2'];
             $longitude2 = $row['longitude2'];
         }
-
+        if (isset($latitude2)) {
         $latitude1 < $latitude2 ? ($minLatitude = $latitude1) && ($maxLatitude = $latitude2)
             : ($minLatitude = $latitude2) && ($maxLatitude = $latitude1);
         $longitude1 < $longitude2 ? ($minLongitude = $longitude1) && ($maxLongitude = $longitude2)
             : ($minLongitude = $longitude2) && ($maxLongitude = $longitude1);
+        } else {
+            
+        }
 
 
         $anomalias = "SELECT anomalia.id,zona,imagem,lingua,ts,anomalia.descricao,tem_anomalia_redacao
         FROM incidencia,anomalia,item WHERE anomalia.id=anomalia_id AND item.id=item_id AND 
         latitude>=:minLatitude AND latitude<=:maxLatitude AND 
-        longitude>=:minLongitude AND longitude<=:maxLongitude";
+        longitude>=:minLongitude AND longitude<=:maxLongitude
+        ORDER BY anomalia.id ASC";
 
         $result = $db->prepare($anomalias);
         $result->execute([

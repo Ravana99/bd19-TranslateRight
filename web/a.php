@@ -120,7 +120,7 @@
             echo "<input type=\"hidden\" name=\"action\" value=\"addItem\"/></p>";
             echo "<p>Descrição: <input type=\"text\" name=\"descricao\"/></p>";
 
-            $coordenadas = "SELECT latitude,longitude FROM local_publico";
+            $coordenadas = "SELECT latitude,longitude FROM local_publico ORDER BY latitude ASC, longitude ASC";
             $result = $db->prepare($coordenadas);
             $result->execute();
             echo "<p>Latitude / Longitude: ";
@@ -246,10 +246,10 @@
         }
 
 
-        $local_publico = "SELECT latitude,longitude,nome FROM local_publico";
-        $item = "SELECT id,descricao,localizacao,latitude,longitude FROM item";
-        $anomalia = "SELECT id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao FROM anomalia";
-        $anomalia_traducao = "SELECT id,zona2,lingua2 FROM anomalia_traducao";
+        $local_publico = "SELECT latitude,longitude,nome FROM local_publico ORDER BY latitude ASC, longitude ASC";
+        $item = "SELECT id,descricao,localizacao,latitude,longitude FROM item ORDER BY id ASC";
+        $anomalia = "SELECT id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao FROM anomalia ORDER BY id ASC";
+        $anomalia_traducao = "SELECT id,zona2,lingua2 FROM anomalia_traducao ORDER BY id ASC";
 
 
         $result = $db->prepare($local_publico);
