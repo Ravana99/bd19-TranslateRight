@@ -54,6 +54,15 @@
         try {
             $db->beginTransaction();
 
+            $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
+        VALUES (default,:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
+            $result = $db->prepare($sql);
+            $result->execute([
+                ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
+                ':ts' => $ts, ':descricao' => $descricao, ':tem_anomalia_redacao' => $tem_anomalia_redacao
+            ]);
+
+
             if ($isAnomaliaTraducao) {
                 $sql = "INSERT INTO anomalia_traducao (id,zona2,lingua2) VALUES (default,:zona2,:lingua2)";
                 $result = $db->prepare($sql);
@@ -62,13 +71,6 @@
                 ]);
             }
 
-            $sql = "INSERT INTO anomalia (id,zona,imagem,lingua,ts,descricao,tem_anomalia_redacao) 
-        VALUES (default,:zona,:imagem,:lingua,:ts,:descricao,:tem_anomalia_redacao)";
-            $result = $db->prepare($sql);
-            $result->execute([
-                ':zona' => $zona, ':imagem' => $imagem, ':lingua' => $lingua,
-                ':ts' => $ts, ':descricao' => $descricao, ':tem_anomalia_redacao' => $tem_anomalia_redacao
-            ]);
             header("Location:/a.php");
         } catch (PDOException $e) {
             $db->rollBack();
@@ -167,12 +169,12 @@
         echo "<form name=\"form\" method=\"get\">";
         echo "<h3>Dados da anomalia de traducao</h3>";
         echo "<input type=\"hidden\" name=\"action\" value=\"addAnomalia\"/></p>";
-        echo "<p>Zona: <input type=\"hidden\" name=\"zona\" value=$zona/></p>";
-        echo "<p>Imagem: <input type=\"hidden\" name=\"imagem\" value=$imagem/></p>";
-        echo "<p>Lingua: <input type=\"hidden\" name=\"lingua\" value=$lingua/></p>";
-        echo "<p>Time stamp: <input type=\"hidden\" name=\"ts\" value=$ts/></p>";
-        echo "<p>Descrição: <input type=\"hidden\" name=\"descricao\" value=$descricao/></p>";
-        echo "<p>Anomalia de Redação: <input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao/></p>";
+        echo "<p><input type=\"hidden\" name=\"zona\" value=$zona/></p>";
+        echo "<p><input type=\"hidden\" name=\"imagem\" value=$imagem/></p>";
+        echo "<p><input type=\"hidden\" name=\"lingua\" value=$lingua/></p>";
+        echo "<p><input type=\"hidden\" name=\"ts\" value=$ts/></p>";
+        echo "<p><input type=\"hidden\" name=\"descricao\" value=$descricao/></p>";
+        echo "<p><input type=\"hidden\" name=\"tem_anomalia_redacao\" value=$tem_anomalia_redacao/></p>";
 
         echo "<p>Zona 2: <input type=\"text\" name=\"zona2\"/></p>";
         echo "<p>Lingua 2: <input type=\"text\" name=\"lingua2\"/></p>";
@@ -225,10 +227,8 @@
                             true
                         );
                         break;
-                    }
-
-                    if (!$_GET['tem_anomalia_redacao']) {
-                        showFormAnomaliaTraducao(
+                    } else if (!$_GET['tem_anomalia_redacao']) {
+                        showForm2(
                             $_GET['zona'],
                             $_GET['imagem'],
                             $_GET['lingua'],
@@ -237,6 +237,7 @@
                             $_GET['tem_anomalia_redacao']
                         );
                     }
+                    console_log('here');
                     addEntry_Anomalia(
                         $db,
                         $_GET['zona'],
@@ -360,7 +361,6 @@
         echo ("<a href=\"a.php?action=showForm&tableName=anomalia\">
         <img style=\"margin-top:10px; margin-bottom:100px;\" width=\"30px\" height=\"30px\" src='add.jpeg'/>
         </a>");
-
 
         $result = $db->prepare($anomalia_traducao);
         $result->execute();

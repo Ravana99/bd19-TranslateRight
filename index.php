@@ -9,21 +9,21 @@
     <a href="a.php">Inserir e remover Locais, Items ou Anomalias</a>
     <br />
     <br />
-    <a href="b.php">Inserir, editar e remover correções e propostas de correção</a>
+    <a href="b.php">Inserir, editar e remover correcoes e propostas de correcao</a>
     <br />
     <br />
     <a href="c.php">Listar utilizadores</a>
     <br />
     <br />
-    <a href="d.php">Registar incidências e duplicados</a>
+    <a href="d.php">Registar incidencias e duplicados</a>
     <br />
     <br />
-    <a href="e.php">Listar todas as anomalias de incidências registadas
-        na área compreendida entre dois locais públicos</a>
+    <a href="e.php">Listar todas as anomalias de incidencias registadas
+        na area compreendida entre dois locais publicos</a>
     <br />
     <br />
     <a href="f.php">Listar todas as anomalias registadas nos ultimos
-        três meses a mais ou menos (dX,dY) graus de (latitude,longitude)</a>
+        tres meses a mais ou menos (dX,dY) graus de (latitude,longitude)</a>
     <br />
     <br />
 

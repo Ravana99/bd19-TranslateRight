@@ -16,29 +16,33 @@
         echo '</script>';
     }
 
-    function addEntry($db, $email, $anomalia_id, $texto)
+    function addCorrecao($db, $email, $nro, $anomalia_id)
     {
-        $sql = "SELECT nro AS total FROM proposta_de_correcao WHERE email=:email AND
-                nro>=ALL(SELECT nro FROM proposta_de_correcao WHERE email=:email);";
+        $sql = "INSERT INTO correcao (email,nro,anomalia_id) VALUES (:email,:nro,:anomalia_id)";
         $result = $db->prepare($sql);
-        $result->execute([':email' => $email]);
-        $nro = 0;
-        foreach ($result as $row) {
-            $nro = $row['total'];
-        }
-        $nro += 1;
+        $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
 
+        header("Location:b.php");
+    }
+
+    function addPropostaCorrecao($db, $email, $texto)
+    {
         try {
             $db->beginTransaction();
+
+            $sql = "SELECT nro AS total FROM proposta_de_correcao WHERE email=:email AND
+                nro>=ALL(SELECT nro FROM proposta_de_correcao WHERE email=:email);";
+            $result = $db->prepare($sql);
+            $result->execute([':email' => $email]);
+            foreach ($result as $row) {
+                $nro = $row['total'];
+            }
+            $nro += 1;
 
             $sql = "INSERT INTO proposta_de_correcao (email,nro,data_hora,texto) 
         VALUES (:email,:nro,:data_hora,:texto)";
             $result = $db->prepare($sql);
             $result->execute([':email' => $email, ':nro' => $nro, ':data_hora' => date('Y-m-d H:i:s'), ':texto' => $texto]);
-
-            $sql = "INSERT INTO correcao (email,nro,anomalia_id) VALUES (:email,:nro,:anomalia_id)";
-            $result = $db->prepare($sql);
-            $result->execute([':email' => $email, ':nro' => $nro, ':anomalia_id' => $anomalia_id]);
 
             $db->commit();
         } catch (PDOException $e) {
@@ -49,25 +53,55 @@
 
         header("Location:b.php");
     }
-    function editEntry($db, $email, $nro, $anomalia_id, $texto, $email_old)
+
+    function editEntry($db, $email, $nro, $texto, $email_old)
     {
         try {
             $db->beginTransaction();
-            #if value is null, value in db stays unchanged
-            if ($email) {
-                $sql = "UPDATE correcao SET email = :email WHERE email = :email_old AND nro=:nro AND anomalia_id=:anomalia_id_old;";
+
+            if ($email != $email_old) {
+
+                $sql = "SELECT email FROM proposta_de_correcao WHERE email=:email and nro=:nro";
                 $result = $db->prepare($sql);
-                $result->execute([
-                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old, ':anomalia_id_old' => $anomalia_id
-                ]);
+                $result->execute([':email' => $email, ':nro' => $nro]);
+                foreach ($result as $row) {
+                    $email_nro_already_exist = $row['email'];
+                }
+                if ($email_nro_already_exist) {
+                    $sql = "SELECT nro AS total FROM proposta_de_correcao WHERE email=:email AND
+                nro>=ALL(SELECT nro FROM proposta_de_correcao WHERE email=:email);";
+                    $result = $db->prepare($sql);
+                    $result->execute([':email' => $email_old]);
+                    foreach ($result as $row) {
+                        $nro_new = $row['total'];
+                    }
+                    $nro_new += 1;
+
+                    $sql = "UPDATE proposta_de_correcao SET email = :email, nro=:nro_new WHERE email = :email_old AND nro=:nro;";
+                    $result = $db->prepare($sql);
+                    $result->execute([
+                        ':email' => $email, ':nro' => $nro, ':nro_new' => $nro_new, ':email_old' => $email_old
+                    ]);
+
+                    $sql = "UPDATE correcao SET email = :email, nro=:nro_new WHERE email = :email_old AND nro=:nro";
+                    $result = $db->prepare($sql);
+                    $result->execute([
+                        ':email' => $email, ':nro' => $nro, ':nro_new' => $nro_new, ':email_old' => $email_old
+                    ]);
+                    $nro = $nro_new;
+                }
 
                 $sql = "UPDATE proposta_de_correcao SET email = :email WHERE email = :email_old AND nro=:nro;";
                 $result = $db->prepare($sql);
                 $result->execute([
                     ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
                 ]);
-            } else {
-                $email = $email_old;
+
+                $sql = "UPDATE correcao SET email = :email WHERE email = :email_old AND nro=:nro";
+                $result = $db->prepare($sql);
+                $result->execute([
+                    ':email' => $email, ':nro' => $nro, ':email_old' => $email_old
+                ]);
             }
             if ($texto) {
                 $sql = "UPDATE proposta_de_correcao SET texto = :texto WHERE email = :email AND nro=:nro;";
@@ -120,7 +154,7 @@
         if ($tableName == 'propostaCorrecao') {
             if ($add) {
                 echo "<h3>Adicionar uma Proposta de Correcao</h3>";
-                echo "<input type=\"hidden\" name=\"action\" value=\"add\"/></p>";
+                echo "<input type=\"hidden\" name=\"action\" value=\"addPropostaCorrecao\"/></p>";
             } else {
                 $email_old = $_GET['email'];
                 $nro = $_GET['nro'];
@@ -143,7 +177,7 @@
             echo "<p>Texto: <input type=\"text\" name=\"texto\"/></p>";
         } else {
             echo "<h3>Adicionar uma Correcao</h3>";
-
+            echo "<input type=\"hidden\" name=\"action\" value=\"addCorrecao\"/></p>";
             $anomalia_id = "SELECT anomalia_id FROM incidencia";
             $result = $db->prepare($anomalia_id);
             $result->execute();
@@ -182,8 +216,11 @@
         if (isset($_GET['action'])) {
             $action = $_GET['action'];
             switch ($action) {
-                case "add":
-                    addEntry($db, $_GET['email'], $_GET['anomalia_id'], $_GET['texto']);
+                case "addCorrecao":
+                    addCorrecao($db, $_GET['email'], $_GET['nro'], $_GET['anomalia_id']);
+                    break;
+                case "addPropostaCorrecao":
+                    addPropostaCorrecao($db, $_GET['email'], $_GET['texto']);
                     break;
 
                 case "edit":
@@ -191,7 +228,6 @@
                         $db,
                         $_GET['email'],
                         $_GET['nro'],
-                        $_GET['anomalia_id'],
                         $_GET['texto'],
                         $_GET['email_old']
                     );
