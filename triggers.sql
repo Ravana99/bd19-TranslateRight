@@ -85,7 +85,7 @@ CREATE OR REPLACE FUNCTION insert_reg_user_proc() RETURNS TRIGGER AS
 $$
 BEGIN
     IF new.email IN (SELECT email FROM utilizador_qualificado) THEN
-        DELETE FROM utilizador_qualificado WHERE email = new.email;
+        DELETE FROM utilizador_qualificado WHERE email=new.email;
     END IF;
     RETURN new;
 END
@@ -99,7 +99,7 @@ CREATE OR REPLACE FUNCTION insert_qual_user_proc() RETURNS TRIGGER AS
 $$
 BEGIN
     IF new.email IN (SELECT email FROM utilizador_regular) THEN
-        DELETE FROM utilizador_regular WHERE email = new.email;
+        DELETE FROM utilizador_regular WHERE email=new.email;
     END IF;
     RETURN new;
 END
@@ -141,7 +141,7 @@ CREATE OR REPLACE FUNCTION delete_reg_user_proc() RETURNS TRIGGER AS
 $$
 BEGIN
     IF (old.email NOT IN (SELECT email FROM utilizador_qualificado) AND old.email IN (SELECT email FROM utilizador)) THEN
-        INSERT INTO utilizador_qualificado values(old.email);
+        INSERT INTO utilizador_qualificado values (old.email);
     END IF;
     RETURN new;
 END
@@ -155,7 +155,7 @@ CREATE OR REPLACE FUNCTION delete_qual_user_proc() RETURNS TRIGGER AS
 $$
 BEGIN
     IF (old.email NOT IN (SELECT email FROM utilizador_regular) AND old.email IN (SELECT email FROM utilizador)) THEN
-        INSERT INTO utilizador_regular values(old.email);
+        INSERT INTO utilizador_regular values (old.email);
     END IF;
     RETURN new;
 END
