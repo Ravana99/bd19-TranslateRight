@@ -1,169 +1,165 @@
-drop function if exists update_anomalia_proc() cascade;
-drop function if exists insert_anomalia_traducao_proc() cascade;
-drop function if exists update_anomalia_traducao_proc() cascade;
-drop function if exists insert_user_proc() cascade;
-drop function if exists insert_reg_user_proc() cascade;
-drop function if exists insert_qual_user_proc() cascade;
-drop function if exists update_reg_user_proc() cascade;
-drop function if exists update_qual_user_proc() cascade;
-drop function if exists delete_reg_user_proc() cascade;
-drop function if exists delete_qual_user_proc() cascade;
+DROP FUNCTION IF EXISTS update_anomalia_proc() CASCADE;
+DROP FUNCTION IF EXISTS insert_anomalia_traducao_proc() CASCADE;
+DROP FUNCTION IF EXISTS update_anomalia_traducao_proc() CASCADE;
+DROP FUNCTION IF EXISTS insert_user_proc() CASCADE;
+DROP FUNCTION IF EXISTS insert_reg_user_proc() CASCADE;
+DROP FUNCTION IF EXISTS insert_qual_user_proc() CASCADE;
+DROP FUNCTION IF EXISTS update_reg_user_proc() CASCADE;
+DROP FUNCTION IF EXISTS update_qual_user_proc() CASCADE;
+DROP FUNCTION IF EXISTS delete_reg_user_proc() CASCADE;
+DROP FUNCTION IF EXISTS delete_qual_user_proc() CASCADE;
 
 
 /* RI-1 */
 
-create or replace function update_anomalia_proc() returns trigger as
+CREATE OR REPLACE FUNCTION update_anomalia_proc() RETURNS TRIGGER AS
 $$
-declare b box;
-begin
-    select zona2 into b from anomalia_traducao where id=new.id;
-    if b is not null and b && new.zona then
-        raise exception 'Zona and zona2 must not overlap';
-    end if;
-    return new;
-end
-$$ language plpgsql;
+DECLARE b BOX;
+BEGIN
+    SELECT zona2 INTO b FROM anomalia_traducao WHERE id=new.id;
+    IF b IS NOT NULL AND b && new.zona THEN
+        RAISE EXCEPTION 'Zona AND zona2 must not overlap';
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger update_anomalia before update on anomalia
-for each row execute procedure update_anomalia_proc();
+CREATE TRIGGER update_anomalia BEFORE UPDATE ON anomalia
+FOR EACH ROW EXECUTE PROCEDURE update_anomalia_proc();
 
 
-create or replace function insert_anomalia_traducao_proc() returns trigger as
+CREATE OR REPLACE FUNCTION insert_anomalia_traducao_proc() RETURNS TRIGGER AS
 $$
-declare b box;
-begin
-    if new.id not in (select id from anomalia) then
-        raise exception 'Please insert an anomalia with that id first';
-    elsif new.id not in (select id from anomalia where id=new.id and tem_anomalia_redacao=false) then
-        raise exception 'The anomalia id introduced does not require zona2/lingua2 values';
+DECLARE b BOX;
+BEGIN
+    IF new.id NOT IN (SELECT id FROM anomalia) THEN
+        RAISE EXCEPTION 'Please insert an anomalia with that id first';
+    ELSIF new.id NOT IN (SELECT id FROM anomalia WHERE id=new.id AND tem_anomalia_redacao=false) THEN
+        RAISE EXCEPTION 'The anomalia id introduced does not require zona2/lingua2 values';
     else
-        select zona into b from anomalia where id=new.id;
-        if b && new.zona2 then
-            raise exception 'Zona and zona2 must not overlap';
-        end if;
-    end if;
-    return new;
-end
-$$ language plpgsql;
+        SELECT zona INTO b FROM anomalia WHERE id=new.id;
+        IF b && new.zona2 THEN
+            RAISE EXCEPTION 'Zona AND zona2 must not overlap';
+        END IF;
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger insert_anomalia_traducao before insert on anomalia_traducao
-for each row execute procedure insert_anomalia_traducao_proc();
+CREATE TRIGGER insert_anomalia_traducao BEFORE INSERT ON anomalia_traducao
+FOR EACH ROW EXECUTE PROCEDURE insert_anomalia_traducao_proc();
 
 
-create or replace function update_anomalia_traducao_proc() returns trigger as
+CREATE OR REPLACE FUNCTION update_anomalia_traducao_proc() RETURNS TRIGGER AS
 $$
-declare b box;
-begin
-    select zona into b from anomalia where id=new.id;
-    if b && new.zona2 then
-        raise exception 'Zona and zona2 must not overlap';
-    end if;
-    return new;
-end
-$$ language plpgsql;
+DECLARE b BOX;
+BEGIN
+    SELECT zona INTO b FROM anomalia WHERE id=new.id;
+    IF b && new.zona2 THEN
+        RAISE EXCEPTION 'Zona AND zona2 must not overlap';
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger update_anomalia_traducao before update on anomalia_traducao
-for each row execute procedure update_anomalia_traducao_proc();
+CREATE TRIGGER update_anomalia_traducao BEFORE UPDATE ON anomalia_traducao
+FOR EACH ROW EXECUTE PROCEDURE update_anomalia_traducao_proc();
 
 
 
 /* RI-4, RI-5, RI-6 */
 
-create or replace function insert_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION insert_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    insert into utilizador_regular values(new.email);
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    INSERT INTO utilizador_regular VALUES (new.email);
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger insert_user after insert on utilizador
-for each row execute procedure insert_user_proc();
+CREATE TRIGGER insert_user AFTER INSERT ON utilizador
+FOR EACH ROW EXECUTE PROCEDURE insert_user_proc();
 
 
-create or replace function insert_reg_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION insert_reg_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    if new.email in (select email from utilizador_qualificado) then
-        delete from utilizador_qualificado where email = new.email;
-    end if;
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    IF new.email IN (SELECT email FROM utilizador_qualificado) THEN
+        DELETE FROM utilizador_qualificado WHERE email = new.email;
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger insert_reg_user after insert on utilizador_regular
-for each row execute procedure insert_reg_user_proc();
+CREATE TRIGGER insert_reg_user AFTER INSERT ON utilizador_regular
+FOR EACH ROW EXECUTE PROCEDURE insert_reg_user_proc();
 
 
-create or replace function insert_qual_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION insert_qual_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    if new.email in (select email from utilizador_regular) then
-        delete from utilizador_regular where email = new.email;
-    end if;
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    IF new.email IN (SELECT email FROM utilizador_regular) THEN
+        DELETE FROM utilizador_regular WHERE email = new.email;
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger insert_qual_user after insert on utilizador_qualificado
-for each row execute procedure insert_qual_user_proc();
+CREATE TRIGGER insert_qual_user AFTER INSERT ON utilizador_qualificado
+FOR EACH ROW EXECUTE PROCEDURE insert_qual_user_proc();
 
 
 
-create or replace function update_reg_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION update_reg_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    if new.email in (select email from utilizador_qualificado) then
-        raise exception 'Please update the table utilizador to update user emails.';
-    end if;
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    IF new.email IN (SELECT email FROM utilizador_qualificado) THEN
+        RAISE EXCEPTION 'Please update the table utilizador to update user emails.';
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger update_reg_user before update on utilizador_regular
-for each row execute procedure update_reg_user_proc();
+CREATE TRIGGER update_reg_user BEFORE UPDATE ON utilizador_regular
+FOR EACH ROW EXECUTE PROCEDURE update_reg_user_proc();
 
-create or replace function update_qual_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION update_qual_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    if new.email in (select email from utilizador_regular) then
-        raise exception 'Please update the table utilizador to update user emails.';
-    end if;
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    IF new.email IN (SELECT email FROM utilizador_regular) THEN
+        RAISE EXCEPTION 'PleASe update the table utilizador to update user emails.';
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger update_qual_user before update on utilizador_qualificado
-for each row execute procedure update_qual_user_proc();
+CREATE TRIGGER update_qual_user BEFORE UPDATE ON utilizador_qualificado
+FOR EACH ROW EXECUTE PROCEDURE update_qual_user_proc();
 
 
-create or replace function delete_reg_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION delete_reg_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    if (old.email not in (select email from utilizador_qualificado) and old.email in (select email from utilizador)) then
-        insert into utilizador_qualificado values(old.email);
-    end if;
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    IF (old.email NOT IN (SELECT email FROM utilizador_qualificado) AND old.email IN (SELECT email FROM utilizador)) THEN
+        INSERT INTO utilizador_qualificado values(old.email);
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger delete_reg_user after delete on utilizador_regular
-for each row execute procedure delete_reg_user_proc();
+CREATE TRIGGER delete_reg_user AFTER DELETE ON utilizador_regular
+FOR EACH ROW EXECUTE PROCEDURE delete_reg_user_proc();
 
 
-create or replace function delete_qual_user_proc() returns trigger as
+CREATE OR REPLACE FUNCTION delete_qual_user_proc() RETURNS TRIGGER AS
 $$
-begin
-    if (old.email not in (select email from utilizador_regular) and old.email in (select email from utilizador)) then
-        insert into utilizador_regular values(old.email);
-    end if;
-    return new;
-end
-$$ language plpgsql;
+BEGIN
+    IF (old.email NOT IN (SELECT email FROM utilizador_regular) AND old.email IN (SELECT email FROM utilizador)) THEN
+        INSERT INTO utilizador_regular values(old.email);
+    END IF;
+    RETURN new;
+END
+$$ LANGUAGE plpgsql;
 
-create trigger delete_qual_user after delete on utilizador_qualificado
-for each row execute procedure delete_qual_user_proc();
-
-
-
-
+CREATE TRIGGER delete_qual_user AFTER DELETE ON utilizador_qualificado
+FOR EACH ROW EXECUTE PROCEDURE delete_qual_user_proc();
