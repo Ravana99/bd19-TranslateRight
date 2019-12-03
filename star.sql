@@ -45,14 +45,14 @@ CREATE TABLE f_anomalia (
     tipo_anomalia VARCHAR(20),
     com_proposta BOOLEAN,
     CONSTRAINT pk_f_anomalia PRIMARY KEY(id_utilizador, id_tempo, id_local, id_lingua),
-    CONSTRAINT fk_f_anomalia_d_utilizador 
-        FOREIGN KEY(id_utilizador) REFERENCES d_utilizador(id_utilizador),
-    CONSTRAINT fk_f_anomalia_d_tempo 
-        FOREIGN KEY(id_tempo) REFERENCES d_tempo(id_tempo),
-    CONSTRAINT fk_f_anomalia_d_local 
-        FOREIGN KEY(id_local) REFERENCES d_local(id_local),
-    CONSTRAINT fk_f_anomalia_d_lingua 
-        FOREIGN KEY(id_lingua) REFERENCES d_lingua(id_lingua)
+    CONSTRAINT fk_f_anomalia_d_utilizador FOREIGN KEY(id_utilizador)
+        REFERENCES d_utilizador(id_utilizador) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_f_anomalia_d_tempo FOREIGN KEY(id_tempo)
+        REFERENCES d_tempo(id_tempo) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_f_anomalia_d_local FOREIGN KEY(id_local)
+        REFERENCES d_local(id_local) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_f_anomalia_d_lingua FOREIGN KEY(id_lingua)
+        REFERENCES d_lingua(id_lingua) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -69,7 +69,8 @@ SELECT DISTINCT
      (SELECT 'Quinta-Feira' WHERE EXTRACT(DOW FROM ts)=4) UNION ALL 
      (SELECT 'Sexta-Feira' WHERE EXTRACT(DOW FROM ts)=5) UNION ALL 
      (SELECT 'Sabado' WHERE EXTRACT(DOW FROM ts)=6) UNION ALL 
-     (SELECT 'Domingo' WHERE EXTRACT(DOW FROM ts)=0)), 
+     (SELECT 'Domingo' WHERE EXTRACT(DOW FROM ts)=0)
+    ), 
     EXTRACT(WEEK FROM ts), 
     EXTRACT(MONTH FROM ts), 
     FLOOR((EXTRACT(MONTH FROM ts)-1)/3)+1, 
@@ -98,13 +99,10 @@ SELECT
       WHERE id_utilizador=2 AND incidencia.email IN (SELECT email FROM utilizador_qualificado))
     ),
     (SELECT id_tempo FROM d_tempo 
-     WHERE dia=EXTRACT(DAY FROM ts) AND 
-           mes=EXTRACT(MONTH FROM ts) AND 
-           ano=EXTRACT(YEAR FROM ts)
+     WHERE dia=EXTRACT(DAY FROM ts) AND mes=EXTRACT(MONTH FROM ts) AND ano=EXTRACT(YEAR FROM ts)
     ),
     (SELECT id_local FROM d_local 
-     WHERE item.latitude=d_local.latitude AND 
-           item.longitude = d_local.longitude
+     WHERE item.latitude=d_local.latitude AND item.longitude=d_local.longitude
     ),
     (SELECT id_lingua FROM d_lingua 
      WHERE d_lingua.lingua=anomalia.lingua
