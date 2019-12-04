@@ -142,7 +142,7 @@ CREATE OR REPLACE FUNCTION update_qual_user_proc() RETURNS TRIGGER AS
 $$
 BEGIN
     IF new.email IN (SELECT email FROM utilizador_regular) THEN
-        RAISE EXCEPTION 'PleASe update the table utilizador to update user emails.';
+        RAISE EXCEPTION 'Please update the table utilizador to update user emails.';
     END IF;
     RETURN new;
 END
