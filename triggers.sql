@@ -69,6 +69,21 @@ FOR EACH ROW EXECUTE PROCEDURE update_anomalia_traducao_proc();
 
 /* RI-4, RI-5, RI-6 */
 
+/*
+A logica para o tratamento de utilizadores e:
+- Inserir um novo utilizador (na tabela utilizador) coloca o mesmo na tabela utilizador_regular;
+- Inserir um utilizador na tabela utilizador_qualificado retira-o da tabela utilizador_regular e vice-versa:
+  ou seja, esta e a forma de trocar o estatuto de um utilizador. Em alternativa, tambem se pode trocar o
+  estatuto de um utilizador regular apagando-o da tabela utilizador_regular (e inserido automaticamente
+  na tabela utilizador_qualificado) e vice-versa;
+- Atualizar qualquer entrada da tabela utilizador_regular levanta uma excecao quando o novo e-mail ja existe
+  na tabela utilizador_qualificado e vice-versa: evita que um utilizador possa estar nas tabelas
+  utilizador_regular e utilizador_qualificado ao mesmo tempo);
+- As atualizacoes e remocoes efetuadas na tabela utilizador nao tem regras especiais (as alteracoes sao
+  propagadas para as restantes tabelas por cascade, como definido no ficheiro schema.sql da terceira entrega).
+*/
+
+
 CREATE OR REPLACE FUNCTION insert_user_proc() RETURNS TRIGGER AS
 $$
 BEGIN
