@@ -135,6 +135,9 @@ INSERT INTO utilizador_qualificado VALUES ('cozido@gmail.com');
 
 /*Utilizadores Regulares*/
 
+/* This will generate errors if the triggers are created before populating the DB, but these errors are harmless:
+   the triggers automated these inserts therefore they are technically not needed anymore */
+
 INSERT INTO utilizador_regular VALUES ('tavares@sapo.pt');
 INSERT INTO utilizador_regular VALUES ('joao@gmail.com');
 INSERT INTO utilizador_regular VALUES ('nunes@gmail.com');

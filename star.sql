@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS f_anomalia CASCADE;
 CREATE TABLE d_utilizador
 (
     id_utilizador SERIAL NOT NULL,
+    email VARCHAR(100),
     tipo VARCHAR(20),
     CONSTRAINT pk_d_utilizador PRIMARY KEY(id_utilizador)
 );
@@ -33,7 +34,6 @@ CREATE TABLE d_local (
 CREATE TABLE d_lingua (
     id_lingua SERIAL NOT NULL,
     lingua VARCHAR(100),
-    pais VARCHAR(100),
     CONSTRAINT pk_d_lingua PRIMARY KEY(id_lingua)
 );
 
@@ -56,9 +56,12 @@ CREATE TABLE f_anomalia (
 );
 
 
-INSERT INTO d_utilizador (tipo) VALUES 
-    ('Regular'),
-    ('Qualificado');
+INSERT INTO d_utilizador (email, tipo) 
+(SELECT email, 'Regular'
+ FROM utilizador_regular)
+UNION ALL
+(SELECT email, 'Qualificado'
+ FROM utilizador_qualificado);
 
 INSERT INTO d_tempo (dia, dia_da_semana, semana, mes, trimestre, ano)
 SELECT DISTINCT
@@ -81,22 +84,16 @@ INSERT INTO d_local (latitude, longitude, nome)
 SELECT latitude, longitude, nome 
 FROM local_publico;
 
-INSERT INTO d_lingua (lingua, pais) VALUES 
-    ('Portugues','Portugal'), 
-    ('Espanhol','Espanha'), 
-    ('Frances','Franca'), 
-    ('Ingles','Reino Unido'), 
-    ('Italiano','Italia'); 
+INSERT INTO d_lingua (lingua)
+SELECT DISTINCT lingua
+FROM anomalia;
 
 
 
 INSERT INTO f_anomalia
 SELECT
-    ((SELECT id_utilizador FROM d_utilizador 
-      WHERE id_utilizador=1 AND incidencia.email IN (SELECT email FROM utilizador_regular)) 
-      UNION ALL 
-     (SELECT id_utilizador FROM d_utilizador 
-      WHERE id_utilizador=2 AND incidencia.email IN (SELECT email FROM utilizador_qualificado))
+    (SELECT id_utilizador FROM d_utilizador 
+      WHERE incidencia.email=d_utilizador.email
     ),
     (SELECT id_tempo FROM d_tempo 
      WHERE dia=EXTRACT(DAY FROM ts) AND mes=EXTRACT(MONTH FROM ts) AND ano=EXTRACT(YEAR FROM ts)
