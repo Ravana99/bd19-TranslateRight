@@ -9,8 +9,7 @@ das tabelas ultrapassa em várias ordens de grandeza a memória disponível,
 o acesso ao disco vai ser muito frequente, logo não é necessário criar um index.
 
 --1.2
-Como é um numero de registos muito pequeno não convém usar um index hash devido 
-aos possíveis overflows.
+Como a query filtra com o operador between, cria-se um btree index.
 
 CREATE INDEX data_hora__proposta_de_correcao_idx ON proposta_de_correcao USING btree (data_hora);
 
