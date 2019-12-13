@@ -115,7 +115,7 @@ CREATE TABLE correcao
     email VARCHAR(100) NOT NULL,
     nro INTEGER NOT NULL,
     anomalia_id INTEGER NOT NULL,
-    CONSTRAINT pk_correcao PRIMARY KEY(email, nro, anomalia_id),
+    CONSTRAINT pk_correcao PRIMARY KEY(anomalia_id,email, nro),
     CONSTRAINT fk_correcao_proposta_de_correcao FOREIGN KEY(email, nro) REFERENCES proposta_de_correcao(email, nro) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_correcao_incidencia FOREIGN KEY(anomalia_id) REFERENCES incidencia(anomalia_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
